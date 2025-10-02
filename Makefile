@@ -16,22 +16,20 @@ build-haddop3: build-haddop-runner
 	docker build -t remstef/hadoop3 ./hadoop-docker-hadoop-3
 
 build-haddop2-jobimtext: build-haddop2
-	docker build -t remstef/hadoop3-jobimtext --build-arg HADOOP_VERSION=3 ./hadoop-docker-hadoop-jobimtext
+	docker build -t remstef/hadoop2-jobimtext --build-arg HADOOP_VERSION=2 ./hadoop-docker-hadoop-jobimtext
 
 build-haddop3-jobimtext: build-haddop3
-	docker build -t remstef/hadoop2-jobimtext --build-arg HADOOP_VERSION=2 ./hadoop-docker-hadoop-jobimtext
+	docker build -t remstef/hadoop3-jobimtext --build-arg HADOOP_VERSION=3 ./hadoop-docker-hadoop-jobimtext
 
 cluster-h2-compose-up: build-haddop2-jobimtext
 	docker compose -f docker-compose-hadoop2-jobimtext.yml up -d
 
-cluster-h2-compose-down:
-	docker compose -f docker-compose-hadoop2-jobimtext.yml down
-
 cluster-h3-compose-up: build-haddop3-jobimtext
 	docker compose -f docker-compose-hadoop3-jobimtext.yml up -d
 
-cluster-h3-compose-down:
+cluster-compose-down:
+	docker compose -f docker-compose-hadoop2-jobimtext.yml down
 	docker compose -f docker-compose-hadoop3-jobimtext.yml down
 
-attach:
+cluster-attach:
 	sh attach-containers.sh

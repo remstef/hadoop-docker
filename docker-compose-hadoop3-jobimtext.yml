@@ -1,35 +1,40 @@
 
 services:
 
-  datanode: &hadoopjobimtextref
+  namenode:
     image: remstef/hadoop3-jobimtext
-    hostname: datanode
     build:
       context: ./hadoop-docker-hadoop-jobimtext
       dockerfile: Dockerfile
       args:
         HADOOP_VERSION: 3
-    command: ["hdfs", "datanode"]
-    env_file:
-      - ./config-hadoop2.env
-
-  namenode:
-    <<: *hadoopjobimtextref
     hostname: namenode
     command: ["hdfs", "namenode"]
     ports:
       - 9870:9870
+    env_file:
+      - ./config-hadoop3.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
+
+  datanode: &hadoopref
+    image: remstef/hadoop3
+    hostname: datanode
+    build:
+      context: ./hadoop-docker-hadoop-3
+      dockerfile: Dockerfile
+    command: ["hdfs", "datanode"]
+    env_file:
+      - ./config-hadoop3.env
   
   resourcemanager:
-    <<: *hadoopjobimtextref
+    <<: *hadoopref
     hostname: resourcemanager
     command: ["yarn", "resourcemanager"]
     ports:
       - 8088:8088
   
   nodemanager:
-    <<: *hadoopjobimtextref
+    <<: *hadoopref
     hostname: nodemanager
     command: ["yarn", "nodemanager"]

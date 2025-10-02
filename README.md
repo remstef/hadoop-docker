@@ -1,34 +1,64 @@
+Makefile targets:
+
+```
+build-haddop-runner
+
+build-haddop2
+
+build-haddop3
+
+build-haddop2-jobimtext
+
+build-haddop3-jobimtext
+
+cluster-h2-compose-up
+
+cluster-h2-compose-down
+
+cluster-h3-compose-up
+
+cluster-h3-compose-down
+
+cluster-attach
 ```
 
-docker build -t remstef/hadoop-runner ./hadoop-docker-hadoop-runner-jdk8-u2204
+run cluster with (either or)
+```
+make cluster-h2-compose-up
 
-docker build -t remstef/hadoop2 ./hadoop-docker-hadoop-2
+or
 
-docker build -t remstef/hadoop3 ./hadoop-docker-hadoop-3
-
-docker build -t remstef/hadoop3-jobimtext --build-arg HADOOP_VERSION=3 ./hadoop-docker-hadoop-jobimtext
-
-docker build -t remstef/hadoop2-jobimtext --build-arg HADOOP_VERSION=2 ./hadoop-docker-hadoop-jobimtext
+make cluster-h3-compose-up
 ```
 
 attach to containers:
 ```
-sh attach-containers.sh
+make cluster-attach
 ```
 
-test spark (execute on any node, :q to quit):
+test yarn/hadoop:
+```
+yarn jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar pi 10 15
+```
+
+test spark (execute on namenode, :q to quit):
 ```
 spark-shell --master=yarn
 ```
 
-test pig (execute on any node, \q to quit):
+test pig (execute on namenode, \q to quit):
 ```
-pig
+pig -
 ```
 
-test jobimtext (execute on any node):
+test jobimtext (execute on namenode):
 ```
 hdfs dfs -mkdir -p /user/hadoop/mouse
 hdfs dfs -put mouse-corpus.txt /user/hadoop/mouse/corpus.txt
 sh mouse_trigram_s0.0_f2_w2_wf2_wpfmax1000_wpfmin2_p1000_sc_log_scored_LMI_simsort_ms_2_l200.sh
+```
+
+shutdown cluster
+```
+make cluster-compose-down
 ```
