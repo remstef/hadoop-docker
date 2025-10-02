@@ -1,0 +1,37 @@
+
+services:
+
+  datanode: &hadoopjobimtextref
+    image: remstef/hadoop2-jobimtext
+    hostname: datanode
+    build:
+      context: ./hadoop-docker-hadoop-jobimtext
+      args:
+        HADOOP_VERSION: 2
+      dockerfile: Dockerfile
+    command: ["hdfs", "datanode"]
+    env_file:
+      - ./config-hadoop2.env
+
+  namenode:
+    <<: *hadoopjobimtextref
+    hostname: namenode
+    command: ["hdfs", "namenode"]
+    ports:
+      # - 9870:9870
+      - 50070:50070
+    environment:
+      ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
+      # ENSURE_NAMENODE_DIR: "/tmp/hadoop-root/dfs/name"
+  
+  resourcemanager:
+    <<: *hadoopjobimtextref
+    hostname: resourcemanager
+    command: ["yarn", "resourcemanager"]
+    ports:
+      - 8088:8088
+  
+  nodemanager:
+    <<: *hadoopjobimtextref
+    hostname: nodemanager
+    command: ["yarn", "nodemanager"]

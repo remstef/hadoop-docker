@@ -1,0 +1,53 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+ARG HADOOP_VERSION=3
+
+FROM remstef/hadoop${HADOOP_VERSION}
+
+USER root
+WORKDIR /opt
+
+# install pig
+ARG PIG_URL=https://dlcdn.apache.org/pig/latest/pig-0.18.0.tar.gz
+RUN curl -LSs -o pig.tar.gz $PIG_URL && tar zxf pig.tar.gz && rm pig.tar.gz && ln -s pig* pig && chown -R hadoop:users /opt/pig
+ENV PATH="$PATH:/opt/pig/bin"
+ENV PIG_HOME=/opt/pig
+ENV PIG_CLASSPATH=/opt/hadoop/conf
+
+ARG SPARK_URL=https://dlcdn.apache.org/spark/spark-4.0.1/spark-4.0.1-bin-without-hadoop.tgz
+RUN curl -LSs -o spark.tar.gz $SPARK_URL && tar zxf spark.tar.gz && rm spark.tar.gz && ln -s spark* spark && chown -R hadoop:users /opt/spark
+ENV PATH="$PATH:/opt/spark/bin"
+ENV SPARK_HOME="/opt/spark"
+RUN echo "export JAVA_HOME=${OPENJDK_VERSION}" > spark/conf/spark-env.sh \
+    && echo "export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop" >> spark/conf/spark-env.sh \
+    && echo "export YARN_CONF_DIR=/opt/hadoop/etc/hadoop" >> spark/conf/spark-env.sh \
+    && echo "export SPARK_DIST_CLASSPATH=$(hadoop classpath)" >> spark/conf/spark-env.sh \
+    && echo "spark.yarn.appMasterEnv.JAVA_HOME=${OPENJDK_VERSION}" > spark/conf/spark-defaults.conf \
+    && echo "spark.executorEnv.JAVA_HOME=${OPENJDK_VERSION}" >> spark/conf/spark-defaults.conf
+  # && echo "spark.eventLog.dir file://${SPARK_HOME}/event_logs" >> $SPARK_HOME/conf/spark-defaults.conf \
+
+ARG JOBIMTEXT_URL=http://ltdata1.informatik.uni-hamburg.de/jobimtext-resources/jobimtext.p/jobimtext_pipeline_0.1.5beta.tar.gz
+RUN curl -LSs -o jobimtext.tar.gz $JOBIMTEXT_URL && tar zxf jobimtext.tar.gz && rm jobimtext.tar.gz && ln -s jobimtext* jobimtext && chown -R hadoop:users /opt/jobimtext
+RUN apt update -q \
+    && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+      python2-minimal \
+    && apt clean
+
+RUN bash -c 'echo "shopt -s globstar" >> /etc/bashrc'
+RUN bash -c 'echo "[ -n \"\$BASH_VERSION\" ] && shopt -s globstar" >> /etc/profile'
+
+WORKDIR /opt/jobimtext
+USER hadoop
