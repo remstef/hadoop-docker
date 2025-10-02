@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM remstef/hadoop-runner
+FROM remstef/hadoop-runner:2
 USER root
 ARG HADOOP_URL=https://www.apache.org/dyn/mirrors/mirrors.cgi?action=download&filename=hadoop/common/hadoop-2.10.2/hadoop-2.10.2.tar.gz
 WORKDIR /opt

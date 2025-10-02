@@ -6,13 +6,16 @@
 # build:
 # 	docker build -t $(IMAGE_NAME) -f $(DOCKERFILE) .
 
-build-haddop-runner:
-	docker build -t remstef/hadoop-runner --build-arg OPENJDK_VERSION=21-jdk --build-arg OPENJDK_VERSION_HADOOP=11-jdk ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+build-haddop2-runner:
+	docker build -t remstef/hadoop-runner:2 ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
 
-build-haddop2: build-haddop-runner
+build-haddop3-runner:
+	docker build -t remstef/hadoop-runner:3 --build-arg OPENJDK_VERSION=21-jdk --build-arg OPENJDK_VERSION_HADOOP=11-jdk ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+
+build-haddop2: build-haddop2-runner
 	docker build -t remstef/hadoop2 ./hadoop-docker-hadoop-2
 
-build-haddop3: build-haddop-runner
+build-haddop3: build-haddop3-runner
 	docker build -t remstef/hadoop3 ./hadoop-docker-hadoop-3
 
 build-haddop2-jobimtext: build-haddop2
