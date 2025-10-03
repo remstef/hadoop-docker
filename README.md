@@ -1,17 +1,17 @@
 Makefile targets:
 
 ```
-build-haddop2-runner
+build-hadoop2-runner
 
-build-haddop3-runner
+build-hadoop3-runner
 
-build-haddop2
+build-hadoop2
 
-build-haddop3
+build-hadoop3
 
-build-haddop2-jobimtext
+build-hadoop2-jobimtext
 
-build-haddop3-jobimtext
+build-hadoop3-jobimtext
 
 cluster-h2-compose-up
 
