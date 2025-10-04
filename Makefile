@@ -53,7 +53,7 @@ cluster-swarm-runtest:
 	NAMENODE=$$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1)) \
 		&& echo Namenode container id: $${NAMENODE} \
  	  && docker exec -it $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
- 	  && cat ./test-resorces/mouse-corpus.txt | docker exec -it $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
+ 	  && cat ./test-resources/mouse-corpus.txt | docker exec -it $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
 		&& RUNSCRIPT=$$(docker exec -it $${NAMENODE} python generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
  	  && echo scriptfile: $${RUNSCRIPT} \
 		&& time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} 
