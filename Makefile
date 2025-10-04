@@ -44,7 +44,7 @@ push-hadoop3-jobimtext: build-hadoop3-jobimtext
 	docker push remstef/hadoop3-jobimtext
 
 swarm-stack-deploy:
-	docker stack deploy --compose-file compose-h3-jobimtext-swarm-explicit.yml jbth3
+	docker stack deploy --compose-file docker-compose-h3-jobimtext-swarm-explicit.yml jbth3
 
 swarm-stack-rm:
 	docker stack rm jbth3
