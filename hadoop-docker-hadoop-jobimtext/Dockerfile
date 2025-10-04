@@ -43,8 +43,19 @@ ARG JOBIMTEXT_URL=http://ltdata1.informatik.uni-hamburg.de/jobimtext-resources/j
 RUN curl -LSs -o jobimtext.tar.gz $JOBIMTEXT_URL && tar zxf jobimtext.tar.gz && rm jobimtext.tar.gz && ln -s jobimtext* jobimtext && chown -R hadoop:users /opt/jobimtext
 RUN apt update -q \
     && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
-      python2-minimal \
+      python2 \
+      unzip \
     && apt clean
+
+    # python-setuptools
+ARG PYTHON_SETUPTOOLS_URL=https://files.pythonhosted.org/packages/b2/40/4e00501c204b457f10fe410da0c97537214b2265247bc9a5bc6edd55b9e4/setuptools-44.1.1.zip
+RUN curl -LSs -o setuptools.zip $PYTHON_SETUPTOOLS_URL \
+    && unzip setuptools.zip \
+    && rm setuptools.zip \
+    && cd setuptools* \
+    && python2 setup.py install \
+    && cd .. \
+    && rm -rf setuptools*
 
 ARG PYTHON_ARGPARSE_URL=https://files.pythonhosted.org/packages/18/dd/e617cfc3f6210ae183374cd9f6a26b20514bbb5a792af97949c5aacddf0f/argparse-1.4.0.tar.gz
 RUN curl -LSs -o argparse.tar.gz $PYTHON_ARGPARSE_URL \
@@ -54,7 +65,6 @@ RUN curl -LSs -o argparse.tar.gz $PYTHON_ARGPARSE_URL \
     && python2 setup.py install \
     && cd .. \
     && rm -rf argparse*
-
 
 RUN bash -c 'echo "shopt -s globstar" >> /etc/bashrc'
 RUN bash -c 'echo "[ -n \"\$BASH_VERSION\" ] && shopt -s globstar" >> /etc/profile'
