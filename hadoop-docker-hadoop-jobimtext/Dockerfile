@@ -31,12 +31,12 @@ ARG SPARK_URL=https://dlcdn.apache.org/spark/spark-4.0.1/spark-4.0.1-bin-without
 RUN curl -LSs -o spark.tar.gz $SPARK_URL && tar zxf spark.tar.gz && rm spark.tar.gz && ln -s spark* spark && chown -R hadoop:users /opt/spark
 ENV PATH="$PATH:/opt/spark/bin"
 ENV SPARK_HOME="/opt/spark"
-RUN echo "export JAVA_HOME=${OPENJDK_VERSION}" > spark/conf/spark-env.sh \
+RUN echo "export JAVA_HOME=/opt/java/openjdk-${OPENJDK_VERSION}" > spark/conf/spark-env.sh \
     && echo "export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop" >> spark/conf/spark-env.sh \
     && echo "export YARN_CONF_DIR=/opt/hadoop/etc/hadoop" >> spark/conf/spark-env.sh \
     && echo "export SPARK_DIST_CLASSPATH=$(hadoop classpath)" >> spark/conf/spark-env.sh \
-    && echo "spark.yarn.appMasterEnv.JAVA_HOME=${OPENJDK_VERSION}" > spark/conf/spark-defaults.conf \
-    && echo "spark.executorEnv.JAVA_HOME=${OPENJDK_VERSION}" >> spark/conf/spark-defaults.conf
+    && echo "spark.yarn.appMasterEnv.JAVA_HOME=/opt/java/openjdk-${OPENJDK_VERSION}" > spark/conf/spark-defaults.conf \
+    && echo "spark.executorEnv.JAVA_HOME=/opt/java/openjdk-${OPENJDK_VERSION}" >> spark/conf/spark-defaults.conf
   # && echo "spark.eventLog.dir file://${SPARK_HOME}/event_logs" >> $SPARK_HOME/conf/spark-defaults.conf \
 
 ARG JOBIMTEXT_URL=http://ltdata1.informatik.uni-hamburg.de/jobimtext-resources/jobimtext.p/jobimtext_pipeline_0.1.5beta.tar.gz
