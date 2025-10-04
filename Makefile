@@ -52,9 +52,9 @@ cluster-swarm-rm:
 cluster-swarm-runtest:
 	NAMENODE=$$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1)) \
 	  && echo Namenode container id: $${NAMENODE} \
- 	  && docker exec -it $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
- 	  && cat ./test-resources/mouse-corpus.txt | docker exec -it $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  && RUNSCRIPT=$$(docker exec -it $${NAMENODE} python generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
- 	  && echo scriptfile: $${RUNSCRIPT} \
-	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} 
-#  	  && docker cp mouse_trigram_s0.0_f2_w2_wf2_wpfmax1000_wpfmin2_p1000_sc_log_scored_LMI_simsort_ms_2_l200.sh $${NAMENODE}: runjbtjob.sh \
+	  && docker exec $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
+	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
+	  && RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
+	  && echo scriptfile: $${RUNSCRIPT} \
+	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT}
+

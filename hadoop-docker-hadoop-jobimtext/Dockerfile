@@ -46,6 +46,16 @@ RUN apt update -q \
       python2-minimal \
     && apt clean
 
+ARG PYTHON_ARGPARSE_URL=https://files.pythonhosted.org/packages/18/dd/e617cfc3f6210ae183374cd9f6a26b20514bbb5a792af97949c5aacddf0f/argparse-1.4.0.tar.gz
+RUN curl -LSs -o argparse.tar.gz $PYTHON_ARGPARSE_URL \
+    && tar zxf argparse.tar.gz \
+    && rm argparse.tar.gz \
+    && cd argparse* \
+    && python2 setup.py install \
+    && cd .. \
+    && rm -rf argparse*
+
+
 RUN bash -c 'echo "shopt -s globstar" >> /etc/bashrc'
 RUN bash -c 'echo "[ -n \"\$BASH_VERSION\" ] && shopt -s globstar" >> /etc/profile'
 
