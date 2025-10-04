@@ -24,17 +24,17 @@ build-hadoop2-jobimtext: build-hadoop2
 build-hadoop3-jobimtext: build-hadoop3
 	docker build -t remstef/hadoop3-jobimtext --build-arg HADOOP_VERSION=3 ./hadoop-docker-hadoop-jobimtext
 
-cluster-h2-compose-up: build-hadoop2-jobimtext
+compose-h2-up: build-hadoop2-jobimtext
 	docker compose -f docker-compose-hadoop2-jobimtext.yml up -d
 
-cluster-h3-compose-up: build-hadoop3-jobimtext
+compose-h3-up: build-hadoop3-jobimtext
 	docker compose -f docker-compose-hadoop3-jobimtext.yml up -d
 
-cluster-compose-down:
+compose-down:
 	docker compose -f docker-compose-hadoop2-jobimtext.yml down
 	docker compose -f docker-compose-hadoop3-jobimtext.yml down
 
-cluster-compose-attach:
+compose-attach:
 	sh attach-containers.sh
 
 push-hadoop3: build-hadoop3
@@ -43,13 +43,13 @@ push-hadoop3: build-hadoop3
 push-hadoop3-jobimtext: build-hadoop3-jobimtext
 	docker push remstef/hadoop3-jobimtext
 
-cluster-swarm-deploy:
+swarm-stack-deploy:
 	docker stack deploy --compose-file compose-h3-jobimtext-swarm-explicit.yml jbth3
 
-cluster-swarm-rm:
+swarm-stack-rm:
 	docker stack rm jbth3
 
-cluster-swarm-runtest:
+swarm-stack-runtest:
 	NAMENODE=$$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1)) \
 	  && echo Namenode container id: $${NAMENODE} \
 	  && docker exec $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
