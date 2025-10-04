@@ -50,7 +50,7 @@ cluster-swarm-rm:
 	docker stack rm jbth3
 
 cluster-swarm-runtest:
-	NAMENODE=$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $(docker service ps -q jbth3_namenode | head -n1))
+	NAMENODE=$$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1))
 	echo $${NAMENODE}
 # 	docker exec -it $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse
 # 	cat mouse-corpus.txt | docker exec -it $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt
