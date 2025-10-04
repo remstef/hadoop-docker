@@ -49,6 +49,11 @@ swarm-stack-deploy:
 swarm-stack-rm:
 	docker stack rm jbth3
 
+swarm-stack-attach-namenode:
+	NAMENODE=$$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1)) \
+	  && echo Namenode container id: $${NAMENODE} \
+	  && docker exec -ti $${NAMENODE} bash
+
 swarm-stack-runtest:
 	NAMENODE=$$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1)) \
 	  && echo Namenode container id: $${NAMENODE} \
