@@ -1,0 +1,129 @@
+
+networks:
+  hadoopnet:
+    driver: overlay
+
+services:
+  namenode:
+    image: remstef/hadoop3-jobimtext
+    env_file:
+      - ./config-hadoop3-swarm.env
+    hostname: namenode
+    command: ["hdfs", "namenode"]
+    environment:
+      ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
+    networks:
+      - hadoopnet
+    deploy:
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.hadooprole == master
+
+  datanode1:
+    image: remstef/hadoop3
+    env_file:
+      - ./config-hadoop3-swarm.env
+    hostname: datanode1
+    command: ["hdfs", "datanode"]
+    networks:
+      - hadoopnet
+    deploy:
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.hadooprole == worker1
+
+  datanode2:
+    image: remstef/hadoop3
+    env_file:
+      - ./config-hadoop3-swarm.env
+    hostname: datanode2
+    command: ["hdfs", "datanode"]
+    networks:
+      - hadoopnet
+    deploy:
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.hadooprole == worker2
+
+  datanode3:
+    image: remstef/hadoop3
+    env_file:
+      - ./config-hadoop3-swarm.env
+    hostname: datanode3
+    command: ["hdfs", "datanode"]
+    networks:
+      - hadoopnet
+    deploy:
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.hadooprole == worker3
+  
+  resourcemanager:
+    image: remstef/hadoop3
+    env_file:
+      - ./config-hadoop3-swarm.env
+    hostname: resourcemanager
+    command: ["yarn", "resourcemanager"]
+    networks:
+      - hadoopnet
+    deploy:
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.hadooprole == master
+
+  nodemanager1:
+    image: remstef/hadoop3
+    env_file:
+      - ./config-hadoop3-swarm.env
+    hostname: nodemanager1
+    command: ["yarn", "nodemanager"]
+    networks:
+      - hadoopnet
+    deploy:
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.hadooprole == worker1
+
+  nodemanager2:
+    image: remstef/hadoop3
+    env_file:
+      - ./config-hadoop3-swarm.env
+    hostname: nodemanager2
+    command: ["yarn", "nodemanager"]
+    networks:
+      - hadoopnet
+    deploy:
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.hadooprole == worker2
+
+  nodemanager3:
+    image: remstef/hadoop3
+    env_file:
+      - ./config-hadoop3-swarm.env
+    hostname: nodemanager3
+    command: ["yarn", "nodemanager"]
+    networks:
+      - hadoopnet
+    deploy:
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.hadooprole == worker3
+
+
