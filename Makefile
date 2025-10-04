@@ -50,8 +50,8 @@ cluster-swarm-rm:
 	docker stack rm jbth3
 
 cluster-swarm-runtest:
-	NAMENODE=$$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1))
-	echo $${NAMENODE}
+	NAMENODE := $(shell docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1))
+	echo $(NAMENODE)
 # 	docker exec -it $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse
 # 	cat mouse-corpus.txt | docker exec -it $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt
 # 	docker cp mouse_trigram_s0.0_f2_w2_wf2_wpfmax1000_wpfmin2_p1000_sc_log_scored_LMI_simsort_ms_2_l200.sh $${NAMENODE}: runjbtjob.sh
