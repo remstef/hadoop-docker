@@ -4,6 +4,7 @@ networks:
     driver: overlay
 
 services:
+
   namenode:
     image: remstef/hadoop3-jobimtext
     env_file:
@@ -140,3 +141,4 @@ services:
         max_replicas_per_node: 1
         constraints:
           - node.labels.hadooprole == master
+
