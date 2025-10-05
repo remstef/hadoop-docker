@@ -35,18 +35,20 @@ compose-h2-runtest:
 	  && echo Namenode container id: $${NAMENODE} \
 	  && docker exec $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
 	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  && RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
+	  ; RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
 	  && echo scriptfile: $${RUNSCRIPT} \
-	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT}
+	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
+		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
 
 compose-h3-runtest:
 	NAMENODE=$$(docker compose -f docker-compose-hadoop3-jobimtext.yml ps namenode -q) \
 	  && echo Namenode container id: $${NAMENODE} \
 	  && docker exec $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
 	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  && RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
+	  ; RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
 	  && echo scriptfile: $${RUNSCRIPT} \
-	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT}
+	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
+		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
 
 compose-down:
 	docker compose -f docker-compose-hadoop2-jobimtext.yml down
