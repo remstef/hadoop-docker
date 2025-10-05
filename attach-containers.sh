@@ -7,6 +7,7 @@ if [ -n "$TMUX" ]; then
     split-window -h bash -c "docker exec -ti ${projname}-datanode-1 bash || echo command failed; exec bash" \; \
     split-window -h bash -c "docker exec -ti ${projname}-resourcemanager-1 bash || echo command failed; exec bash" \; \
     split-window -h bash -c "docker exec -ti ${projname}-nodemanager-1 bash || echo command failed; exec bash" \; \
+    split-window -h bash -c "docker exec -ti ${projname}-historyserver-1 bash || echo command failed; exec bash" \; \
     split-window -h bash -c "docker exec -ti ${projname}-namenode-1 bash || echo command failed; exec bash" \; \
     select-layout tiled \; \
     rename-window hadoop-containers
@@ -17,6 +18,7 @@ else
     split-window -h bash -c "docker exec -ti ${projname}-datanode-1 bash || echo command failed; exec bash" \; \
     split-window -h bash -c "docker exec -ti ${projname}-resourcemanager-1 bash || echo command failed; exec bash" \; \
     split-window -h bash -c "docker exec -ti ${projname}-nodemanager-1 bash || echo command failed; exec bash" \; \
+    split-window -h bash -c "docker exec -ti ${projname}-historyserver-1 bash || echo command failed; exec bash" \; \
     split-window -h bash -c "docker exec -ti ${projname}-namenode-1 bash || echo command failed; exec bash" \; \
     select-layout tiled \; \
     rename-window hadoop-containers \; \

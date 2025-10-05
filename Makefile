@@ -30,6 +30,15 @@ compose-h2-up: build-hadoop2-jobimtext
 compose-h3-up: build-hadoop3-jobimtext
 	docker compose -f docker-compose-hadoop3-jobimtext.yml up -d
 
+compose-h3-runtest:
+	NAMENODE=$$(docker compose -f docker-compose-hadoop3-jobimtext.yml ps namenode -q) \
+	  && echo Namenode container id: $${NAMENODE} \
+	  && docker exec $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
+	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
+	  && RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
+	  && echo scriptfile: $${RUNSCRIPT} \
+	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT}
+
 compose-down:
 	docker compose -f docker-compose-hadoop2-jobimtext.yml down
 	docker compose -f docker-compose-hadoop3-jobimtext.yml down
