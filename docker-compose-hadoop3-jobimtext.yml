@@ -38,3 +38,8 @@ services:
     <<: *hadoopref
     hostname: nodemanager
     command: ["yarn", "nodemanager"]
+
+  historyserver:
+    <<: *hadoopref
+    hostname: historyserver
+    command: ["mapred", "historyserver"]
