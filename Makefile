@@ -1,10 +1,22 @@
-# IMAGE_NAME ?= hadoopv3-cluster
-# DOCKERFILE ?= Dockerfile
+# ------------------------------------------------------------------
+# Makefile for Hadoop with Docker Containers (one or multiple nodes)
+# Author: Steffen Remus
+# Date: 2025-10-01
+# Description: 
+#   This Makefile specifies important commands to 
+#   build, start, stop, and interact with the hadoop cluster.
+# ------------------------------------------------------------------
 
-.PHONY: build-hadoop-runner
+# Specify the shell to use for all commands
+SHELL := /bin/bash
 
-# build:
-# 	docker build -t $(IMAGE_NAME) -f $(DOCKERFILE) .
+# all targets are phony
+.PHONY: $(MAKECMDGOALS)
+
+# default target
+list-targets: 
+	@echo "Listing all targets: (run with make <target-name>)"
+	@make -n -p | grep -E -o '^[a-zA-Z0-9_\-]+:' | sed 's/://' | grep -v Makefile | sort
 
 build-hadoop2-runner:
 	docker build -t remstef/hadoop-runner:2 ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
@@ -62,6 +74,36 @@ push-hadoop3: build-hadoop3
 
 push-hadoop3-jobimtext: build-hadoop3-jobimtext
 	docker push remstef/hadoop3-jobimtext
+
+swarm-init:
+	@echo ""
+	@echo "Follow the instructions below to setup a docker swarm."
+	@echo "Details can also be found under the following links:"
+	@echo "    https://docs.docker.com/engine/swarm/swarm-tutorial/"
+	@echo "    https://docs.docker.com/engine/swarm/stack-deploy/"
+	@echo ""
+	@echo "Init the manager: "
+	@echo ""
+	@echo "    docker swarm init --advertise-addr <docker-manager-ip-address>"
+	@echo ""
+	@echo "Use the join token to add worker nodes."
+	@echo "On each worker run: "
+	@echo ""
+	@echo "    docker swarm join --token <join-token> <docker-manager-ip-address>:2377"
+	@echo ""
+	@echo "Assign hadoop roles for the manager and workers."
+	@echo "On the manager execute:"
+	@echo ""
+	@echo "    docker node update --label-add hadooprole=master <docker-manager-node-name>"
+	@echo ""
+	@echo "    for each worker node execute (on the manager): "
+	@echo ""
+	@echo "    docker node update --label-add hadooprole=worker <docker-node-name>"
+	@echo ""
+
+
+
+
 
 swarm-stack-deploy:
 	docker stack deploy --compose-file docker-compose-h3-jobimtext-swarm-explicit.yml jbth3
