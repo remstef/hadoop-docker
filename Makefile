@@ -15,7 +15,7 @@ SHELL := /bin/bash
 
 # default target
 list-targets: 
-	@echo "Listing all targets: (run with make <target-name>)"
+	@echo "Available targets: (run with make <target-name>)"
 	@make -n -p | grep -E -o '^[a-zA-Z0-9_\-]+:' | sed 's/://' | grep -v Makefile | sort
 
 build-hadoop2-runner:
@@ -36,6 +36,10 @@ build-hadoop2-jobimtext: build-hadoop2
 build-hadoop3-jobimtext: build-hadoop3
 	docker build -t remstef/hadoop3-jobimtext --build-arg HADOOP_VERSION=3 ./hadoop-docker-hadoop-jobimtext
 
+pull-hadoop3:
+	docker pull remstef/hadoop3
+	docker pull remstef/hadoop3-jobimtext
+	
 compose-h2-up: build-hadoop2-jobimtext
 	docker compose -f docker-compose-hadoop2-jobimtext.yml up -d
 
@@ -101,10 +105,6 @@ swarm-init:
 	@echo "    docker node update --label-add hadooprole=worker <docker-node-name>"
 	@echo ""
 
-
-
-
-
 swarm-stack-deploy:
 	docker stack deploy --compose-file docker-compose-h3-jobimtext-swarm-explicit.yml jbth3
 
@@ -130,5 +130,3 @@ swarm-stack-runtest:
 	  && echo scriptfile: $${RUNSCRIPT} \
 	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
 		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
-
-
