@@ -83,6 +83,8 @@ push-hadoop3-jobimtext: build-hadoop3-jobimtext
 	docker push remstef/hadoop3-jobimtext
 
 swarm-init:
+	@echo "==== ==== ==== ===="
+	@echo "### ### ### ### ###"
 	@echo ""
 	@echo "Follow the instructions below to setup a docker swarm."
 	@echo "Details can also be found under the following links:"
@@ -114,7 +116,8 @@ swarm-init:
 	@echo ""
 	@echo "    make swarm-status"
 	@echo ""
-	
+	@echo "### ### ### ### ###"
+	@echo "==== ==== ==== ===="
 
 swarm-status:
 	@echo "Swarm info:"
