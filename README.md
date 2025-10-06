@@ -1,3 +1,7 @@
+# About
+
+This project offers single- or multi node [Apache Hadoop](https://hadoop.apache.org/) cluster docker images and docker compose files with [jobimtext](https://sourceforge.net/projects/jobimtext/), [Apache pig](https://pig.apache.org/) and [Apache Spark](https://spark.apache.org/) enabled.
+
 ## Run single node local cluster with compose
 
 Start single node cluster (Note: hadoop2 is available as a legacy version; hadoop3 is preffered):
@@ -134,4 +138,12 @@ Descriptions from https://hub.docker.com/r/apache/hadoop are valid for
 * https://hub.docker.com/r/remstef/hadoop-jobimtext 
 
 images too.
+
+## References:
+* https://hadoop.apache.org/
+* https://sourceforge.net/projects/jobimtext/
+* https://pig.apache.org/
+* https://spark.apache.org/
+
+
 
