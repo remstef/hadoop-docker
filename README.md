@@ -53,7 +53,7 @@ make compose-down
 
 ## Run multi node cluster with docker swarm
 
-Required once:
+Required once (manual process, the following commmand prints the instructions):
 ```
 make swarm-init
 ```

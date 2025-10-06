@@ -107,12 +107,12 @@ swarm-init:
 	@echo ""
 	@echo "    docker node update --label-add hadooprole=worker{i} <docker-node-name>"
 	@echo ""
-	@echo "The example 'docker-compose-h3-jobimtext-swarm-explicit.yml' file expects 4 labelled nodes 
+	@echo "The example 'docker-compose-h3-jobimtext-swarm-explicit.yml' file expects 4 labelled nodes"
 	@echo "(master, worker1, worker2, worker3) which should ideally be different physical machines."
 	@echo ""
 	@echo "Check the status with: "
 	@echo ""
-	@echo "    make swarm-status
+	@echo "    make swarm-status"
 	@echo ""
 	
 
