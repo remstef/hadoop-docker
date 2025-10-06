@@ -47,7 +47,7 @@ Shutdown single-node local cluster
 make compose-down
 ```
 
-## Run multinode node cluster with docker swarm
+## Run multi node cluster with docker swarm
 
 Required once:
 ```
