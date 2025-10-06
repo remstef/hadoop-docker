@@ -121,7 +121,7 @@ swarm-status:
 	docker node ls
 	@echo ""
 	@echo "node labels"
-	docker node ls --format '{{.Hostname}}' | while read h; do echo "${h}:"; docker node inspect ${h} -f '{{ range $$k, $$v := .Spec.Labels }}  {{ $$k }}={{ $$v }}  {{ end }}'; done
+	docker node ls --format '{{.Hostname}}' | while read h; do echo "$${h}:"; docker node inspect $${h} -f '{{ range $$k, $$v := .Spec.Labels }}  {{ $$k }}={{ $$v }}  {{ end }}'; done
 
 swarm-stack-deploy:
 	docker stack deploy --compose-file docker-compose-h3-jobimtext-swarm-explicit.yml jbth3
