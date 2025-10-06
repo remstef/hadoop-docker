@@ -1,4 +1,8 @@
 
+networks:
+  hadoopnet:
+    driver: bridge
+
 services:
 
   namenode:
@@ -10,6 +14,8 @@ services:
     #     HADOOP_VERSION: 3
     hostname: namenode
     command: ["hdfs", "namenode"]
+    networks:
+      - hadoopnet
     ports:
       - 9870:9870
     env_file:
@@ -24,6 +30,8 @@ services:
     #   context: ./hadoop-docker-hadoop-3
     #   dockerfile: Dockerfile
     command: ["hdfs", "datanode"]
+    networks:
+      - hadoopnet
     env_file:
       - ./config-hadoop3.env
   
@@ -43,3 +51,21 @@ services:
     <<: *hadoopref
     hostname: historyserver
     command: ["mapred", "historyserver"]
+
+  gatewayserver:
+    image: linuxserver/openssh-server
+    hostname: gatewayserver
+    restart: unless-stopped
+    ports:
+      - 22222:2222
+    networks:
+      - hadoopnet
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - USER_NAME=hadoop
+      - USER_PASSWORD=hadoop
+      - PASSWORD_ACCESS=true
+    volumes:
+      - ./gatewayserver__sshd_config:/etc/ssh/sshd_config:ro

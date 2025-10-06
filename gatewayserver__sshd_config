@@ -1,0 +1,15 @@
+# Minimal sshd_config for gateway container
+Port 2222
+ListenAddress 0.0.0.0
+Protocol 2
+PermitRootLogin no
+PasswordAuthentication yes
+
+# Important for SOCKS forwarding
+AllowTcpForwarding yes
+PermitTunnel yes
+GatewayPorts yes
+
+# Keepalive
+ClientAliveInterval 60
+ClientAliveCountMax 3

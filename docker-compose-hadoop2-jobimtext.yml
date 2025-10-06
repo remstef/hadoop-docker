@@ -1,4 +1,8 @@
 
+networks:
+  hadoopnet:
+    driver: bridge
+
 services:
 
   datanode: &hadoopref
@@ -12,6 +16,8 @@ services:
     command: ["hdfs", "datanode"]
     env_file:
       - ./config-hadoop2.env
+    networks:
+      - hadoopnet
 
   namenode:
     image: remstef/hadoop2-jobimtext
@@ -28,6 +34,8 @@ services:
       - ./config-hadoop2.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
+    networks:
+      - hadoopnet
   
   resourcemanager:
     <<: *hadoopref
@@ -45,3 +53,21 @@ services:
     <<: *hadoopref
     hostname: historyserver
     command: ["mapred", "historyserver"]
+
+  gatewayserver:
+    image: linuxserver/openssh-server
+    hostname: gatewayserver
+    restart: unless-stopped
+    ports:
+      - 22222:2222
+    networks:
+      - hadoopnet
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - USER_NAME=hadoop
+      - USER_PASSWORD=hadoop
+      - PASSWORD_ACCESS=true
+    volumes:
+      - ./gatewayserver__sshd_config:/etc/ssh/sshd_config:ro
