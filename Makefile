@@ -82,7 +82,7 @@ push-hadoop3: build-hadoop3
 push-hadoop3-jobimtext: build-hadoop3-jobimtext
 	docker push remstef/hadoop3-jobimtext
 
-swarm-init:
+swarm-init-info:
 	@echo "==== ==== ==== ===="
 	@echo "### ### ### ### ###"
 	@echo ""
@@ -155,3 +155,27 @@ swarm-stack-runtest:
 	  && echo scriptfile: $${RUNSCRIPT} \
 	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
 		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
+
+ssh-info:
+	@echo ""
+	@echo "To open a socks proxy type:"
+	@echo ""
+	@echo "  ssh -N -f -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22222 -D 1080 hadoop@localhost"
+	@echo ""
+	@echo "If this is a server, run on your client:"
+	@echo ""
+	@echo "  ssh -N -f -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22222 -D 1080 hadoop@$${HOSTNAME}"
+	@echo ""
+	@echo "  or"
+	@echo ""
+	@echo "  ssh -N -f -J $${HOSTNAME} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22222 -D 1080 hadoop@localhost"
+	@echo ""
+	@echo "Enter the socks proxy details (localhost:1080) in your browser (activate \"use proxy DNS\")."
+	@echo "Addresses:"
+	@echo "  http://nodemanager:8042"
+	@echo "  http://datanode:9864"
+	@echo "  http://namenode:9870"
+	@echo "  http://resourcemanager:8088"
+	@echo "  http://historyserver:19888"
+	@echo ""
+

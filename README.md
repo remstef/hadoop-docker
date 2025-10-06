@@ -13,6 +13,11 @@ or
 make compose-h3-up
 ```
 
+Print information to open a socks proxy forward via ssh to access hadoop internal Web UIs:
+```
+make ssh-info
+```
+
 Attach to containers (requires tmux to be installed):
 ```
 make cluster-attach
@@ -55,7 +60,7 @@ make compose-down
 
 Required once (manual process, the following commmand prints the instructions):
 ```
-make swarm-init
+make swarm-init-info
 ```
 
 Check status of swarm nodes 
@@ -66,6 +71,11 @@ make swarm-status
 Start multinode cluster on a docker swarm with compose file (here, example with 4 nodes, 1 manager & 3 workers, see `docker-compose-h3-jobimtext-swarm-explicit.yml`; execute on the docker swarm manager; Note run `make pull-hadoop3` before to speed up deployment.)
 ```
 make swarm-stack-deploy
+```
+
+Print information to open a socks proxy forward via ssh to access hadoop internal Web UIs:
+```
+make ssh-info
 ```
 
 Run jobimtext test:
@@ -112,7 +122,9 @@ compose-h3-runtest
 compose-attach
 compose-down
 
-swarm-init
+ssh-info
+
+swarm-init-info
 swarm-status
 swarm-stack-deploy
 swarm-stack-namenode
