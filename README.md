@@ -73,6 +73,11 @@ Start multinode cluster on a docker swarm with compose file (here, example with 
 make swarm-stack-deploy
 ```
 
+Check the status of the containers in the swarm stack
+```
+make swarm-stack-status
+```
+
 Print information to open a socks proxy forward via ssh to access hadoop internal Web UIs:
 ```
 make ssh-info
@@ -127,6 +132,7 @@ ssh-info
 swarm-init-info
 swarm-status
 swarm-stack-deploy
+swarm-stack-status
 swarm-stack-namenode
 swarm-stack-runtest
 swarm-stack-attach-namenode
