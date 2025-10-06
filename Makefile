@@ -116,6 +116,10 @@ swarm-init-info:
 	@echo ""
 	@echo "    make swarm-status"
 	@echo ""
+	@echo "Leave swarm (execute on every node):"
+	@echo ""
+	@echo "    docker swarm leave"
+	@echo ""
 	@echo "### ### ### ### ###"
 	@echo "==== ==== ==== ===="
 
@@ -155,6 +159,15 @@ swarm-stack-runtest:
 	  && echo scriptfile: $${RUNSCRIPT} \
 	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
 		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
+
+swarm-stack-status:
+	docker service ls
+	@echo ""
+	@echo "Run the following commands to investigate services:"
+	@echo "  docker service ps <service-name>"
+	@echo "  docker service inspect <service-name> --pretty"
+	@echo "  docker service logs <service-name>"
+	@echo ""
 
 ssh-info:
 	@echo ""
