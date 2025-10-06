@@ -171,7 +171,7 @@ swarm-stack-status:
 
 ssh-info:
 	@echo ""
-	@echo "To open a socks proxy type:"
+	@echo "To open a SOCKS proxy, type:"
 	@echo ""
 	@echo "  ssh -N -f -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22222 -D 1080 hadoop@0.0.0.0"
 	@echo ""
@@ -181,7 +181,9 @@ ssh-info:
 	@echo ""
 	@echo "  (add more jumphosts if necessary, e.g. -J jumphost1,jumphost2,$${HOSTNAME})"
 	@echo ""
-	@echo "Enter the socks proxy details (localhost:1080) in your browser (activate \"use proxy DNS\")."
+	@echo "Type in password 'hadoop'."
+	@echo ""
+	@echo "Enter the SOCKS proxy details (localhost:1080) in your browser (activate \"use proxy DNS\")."
 	@echo "Addresses:"
 	@echo "  http://resourcemanager:8088"
 	@echo "  http://historyserver:19888"
