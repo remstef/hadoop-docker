@@ -125,6 +125,15 @@ swarm-stack-rm
 * Everything provided here is experimental and is not guaranteed to be feature complete.
 * ATTENTION: Data is not persisted, once the cluster's containers are shutdown, the data within the hdfs is lost!
 
+## Docker images
+* https://hub.docker.com/repository/docker/remstef/hadoop3-jobimtext
+* https://hub.docker.com/repository/docker/remstef/hadoop3
+* https://hub.docker.com/repository/docker/remstef/hadoop-runner
+
+(Legacy Hadoop Version 2)
+* https://hub.docker.com/repository/docker/remstef/hadoop2
+* https://hub.docker.com/repository/docker/remstef/hadoop2-jobimtext
+
 ## Attribution
 Dockerfiles taken from the Apache Hadoop project:
 * https://github.com/apache/hadoop/tree/docker-hadoop-2
