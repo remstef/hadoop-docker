@@ -43,10 +43,10 @@ pull-hadoop3:
 	docker pull remstef/hadoop3
 	docker pull remstef/hadoop3-jobimtext
 	
-compose-h2-up: build-hadoop2-jobimtext
+compose-h2-up:
 	docker compose -f docker-compose-hadoop2-jobimtext.yml up -d
 
-compose-h3-up: build-hadoop3-jobimtext
+compose-h3-up:
 	docker compose -f docker-compose-hadoop3-jobimtext.yml up -d
 
 compose-h2-runtest:
