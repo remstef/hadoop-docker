@@ -102,11 +102,26 @@ swarm-init:
 	@echo ""
 	@echo "    for each worker node execute (on the manager): "
 	@echo ""
-	@echo "    docker node update --label-add hadooprole=worker <docker-node-name>"
+	@echo "    docker node update --label-add hadooprole=worker{i} <docker-node-name>"
 	@echo ""
+	@echo "The example 'docker-compose-h3-jobimtext-swarm-explicit.yml' file expects 4 labelled nodes 
+	@echo "(master, worker1, worker2, worker3) which should ideally be different physical machines."
+	@echo ""
+	@echo "Check the status with: "
+	@echo ""
+	@echo "    docker node ls
+	@echo ""
+	
 
 swarm-status:
+	@echo "swarm info"
+	docker info | grep Swarm -A 23
+	@echo ""
+	@echo "node info"
 	docker node ls
+	@echo ""
+	@echo "node labels"
+	docker node ls --format '{{.Hostname}}' | while read h; do echo "${h}:"; docker node inspect ${h} -f '{{ range $$k, $$v := .Spec.Labels }}  {{ $$k }}={{ $$v }}  {{ end }}'; done
 
 swarm-stack-deploy:
 	docker stack deploy --compose-file docker-compose-h3-jobimtext-swarm-explicit.yml jbth3
