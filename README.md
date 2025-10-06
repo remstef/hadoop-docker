@@ -109,6 +109,7 @@ compose-attach
 compose-down
 
 swarm-init
+swarm-status
 swarm-stack-deploy
 swarm-stack-namenode
 swarm-stack-runtest
@@ -126,5 +127,11 @@ Dockerfiles taken from the Apache Hadoop project:
 * https://github.com/apache/hadoop/tree/docker-hadoop-3
 * https://github.com/apache/hadoop/tree/docker-hadoop-runner-jdk17-u2204
 
+Descriptions from https://hub.docker.com/r/apache/hadoop are valid for 
 
+* https://hub.docker.com/r/remstef/hadoop3 
+* https://hub.docker.com/r/remstef/hadoop2 
+* https://hub.docker.com/r/remstef/hadoop-jobimtext 
+
+images too.
 
