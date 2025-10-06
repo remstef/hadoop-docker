@@ -112,19 +112,20 @@ swarm-init:
 	@echo ""
 	@echo "Check the status with: "
 	@echo ""
-	@echo "    docker node ls
+	@echo "    make swarm-status
 	@echo ""
 	
 
 swarm-status:
-	@echo "swarm info"
+	@echo "Swarm info:"
 	docker info | grep Swarm -A 23
 	@echo ""
-	@echo "node info"
+	@echo "Node info:"
 	docker node ls
 	@echo ""
-	@echo "node labels"
+	@echo "Node label info:"
 	docker node ls --format '{{.Hostname}}' | while read h; do echo "$${h}:"; docker node inspect $${h} -f '{{ range $$k, $$v := .Spec.Labels }}  {{ $$k }}={{ $$v }}  {{ end }}'; done
+	@echo ""
 
 swarm-stack-deploy:
 	docker stack deploy --compose-file docker-compose-h3-jobimtext-swarm-explicit.yml jbth3
