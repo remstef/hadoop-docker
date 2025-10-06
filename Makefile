@@ -13,6 +13,9 @@ SHELL := /bin/bash
 # all targets are phony
 .PHONY: $(MAKECMDGOALS)
 
+# all targets should be silent
+.SILENT: $(MAKECMDGOALS)
+
 # default target
 list-targets: 
 	@echo "Available targets: (run with make <target-name>)"
