@@ -105,6 +105,9 @@ swarm-init:
 	@echo "    docker node update --label-add hadooprole=worker <docker-node-name>"
 	@echo ""
 
+swarm-status:
+	docker node ls
+
 swarm-stack-deploy:
 	docker stack deploy --compose-file docker-compose-h3-jobimtext-swarm-explicit.yml jbth3
 

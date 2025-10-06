@@ -54,6 +54,11 @@ Required once:
 make swarm-init
 ```
 
+Check status of swarm nodes 
+```
+make swarm-status
+```
+
 Start multinode cluster on a docker swarm with compose file (here, example with 4 nodes, 1 manager & 3 workers, see `docker-compose-h3-jobimtext-swarm-explicit.yml`; execute on the docker swarm manager; Note run `make pull-hadoop3` before to speed up deployment.)
 ```
 make swarm-stack-deploy
