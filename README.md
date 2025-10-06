@@ -144,7 +144,7 @@ Descriptions from https://hub.docker.com/r/apache/hadoop are valid for
 
 * https://hub.docker.com/r/remstef/hadoop3 
 * https://hub.docker.com/r/remstef/hadoop2 
-* https://hub.docker.com/r/remstef/hadoop-jobimtext 
+* https://hub.docker.com/r/remstef/hadoop3-jobimtext 
 
 images too.
 
