@@ -172,10 +172,10 @@ ssh-info:
 	@echo ""
 	@echo "Enter the socks proxy details (localhost:1080) in your browser (activate \"use proxy DNS\")."
 	@echo "Addresses:"
-	@echo "  http://nodemanager:8042"
-	@echo "  http://datanode:9864"
-	@echo "  http://namenode:9870"
 	@echo "  http://resourcemanager:8088"
 	@echo "  http://historyserver:19888"
+	@echo "  http://namenode:9870"
+	@echo "  http://nodemanager:8042 (nodemanager{1-3} in swarm mode)"
+	@echo "  http://datanode:9864 (datanode{1-3} in swarm mode)"
 	@echo ""
 
