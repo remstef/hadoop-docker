@@ -19,6 +19,9 @@ SHELL := /bin/bash
 # Default compose file if none specified
 file ?= docker-compose.yml
 
+# Default headnode name
+headnode ?= namenode
+
 # # Default Docker images
 # img_hadoop_runner ?: remstef/hadoop-runner:3
 # img_hadoop ?: remstef/hadoop3
@@ -89,14 +92,14 @@ compose-h3-runtest:
 		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
 
 compose-runtest:
-	NAMENODE=$$(docker compose -f $(file) ps namenode -q) \
-	  && echo Namenode container id: $${NAMENODE} \
-	  && docker exec $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
-	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  ; RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
+	HEADNODE=$$(docker compose -f $(file) ps $(headnode) -q) \
+	  && echo headnode container id: $${HEADNODE} \
+	  && docker exec $${HEADNODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
+	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${HEADNODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
+	  ; RUNSCRIPT=$$(docker exec $${HEADNODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
 	  && echo scriptfile: $${RUNSCRIPT} \
-	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
-		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
+	  && time docker exec -it $${HEADNODE} sh $${RUNSCRIPT} \
+		; docker exec $${HEADNODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
 
 compose-down:
 	docker compose -f docker-compose-hadoop2-jobimtext.yml down
