@@ -16,10 +16,26 @@ SHELL := /bin/bash
 # all targets should be silent
 .SILENT: $(MAKECMDGOALS)
 
+# Default compose file if none specified
+file ?= docker-compose.yml
+
+# # Default Docker images
+# img_hadoop_runner ?: remstef/hadoop-runner:3
+# img_hadoop ?: remstef/hadoop3
+# img_hadoop_jobimtext ?: rremstef/hadoop3-jobimtext
+
 # default target
 list-targets: 
 	@echo "Available targets: (run with make <target-name>)"
 	@make -n -p | grep -E -o '^[a-zA-Z0-9_\-]+:' | sed 's/://' | grep -v Makefile | sort
+
+h3:
+	@$(eval file := docker-compose-hadoop3-jobimtext.yml)
+	@echo "Set compose file to: $(file)"
+
+h2:
+	@$(eval file := docker-compose-hadoop2-jobimtext.yml)
+	@echo "Set compose file to: $(file)"
 
 build-hadoop2-runner:
 	docker build -t remstef/hadoop-runner:2 ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
@@ -42,12 +58,15 @@ build-hadoop3-jobimtext: build-hadoop3
 pull-hadoop3:
 	docker pull remstef/hadoop3
 	docker pull remstef/hadoop3-jobimtext
-	
+
 compose-h2-up:
 	docker compose -f docker-compose-hadoop2-jobimtext.yml up -d
 
 compose-h3-up:
 	docker compose -f docker-compose-hadoop3-jobimtext.yml up -d
+
+compose-up:
+	docker compose -f $(file) up -d
 
 compose-h2-runtest:
 	NAMENODE=$$(docker compose -f docker-compose-hadoop2-jobimtext.yml ps namenode -q) \
@@ -69,9 +88,20 @@ compose-h3-runtest:
 	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
 		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
 
+compose-runtest:
+	NAMENODE=$$(docker compose -f $(file) ps namenode -q) \
+	  && echo Namenode container id: $${NAMENODE} \
+	  && docker exec $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
+	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
+	  ; RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
+	  && echo scriptfile: $${RUNSCRIPT} \
+	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
+		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
+
 compose-down:
 	docker compose -f docker-compose-hadoop2-jobimtext.yml down
 	docker compose -f docker-compose-hadoop3-jobimtext.yml down
+	docker compose -f $(file) down
 
 compose-attach:
 	sh attach-containers.sh
