@@ -30,11 +30,12 @@ for service in ${SERVICES}; do
   # alternate splitting vertically and horizontically
   split=$([ $((i % 2)) -eq 0 ] && echo "-h" || echo "-v")
   TMUX_CMD+=" \\; split-window ${split} 'bash -c \"docker exec -ti \$(docker compose -f ${COMPOSE_FILE} ps -q ${service}) bash || echo command failed; exec bash\"'"
+  TMUX_CMD+=" \\; select-layout tiled"
   i=$((i + 1))
 done
 
 # Add final layout commands
-TMUX_CMD+=" \\; select-layout tiled \\; rename-window hadoop-containers"
+TMUX_CMD+=" \\; rename-window hadoop-containers"
 
 # Execute the constructed command
 eval "${TMUX_CMD}"
