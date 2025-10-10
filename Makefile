@@ -55,11 +55,11 @@ check-file:
 	echo "File '$(file)' exists"
 
 build-hadoop-runner:
-	ifeq ($(hadoop_version),3)
-		docker build -t remstef/hadoop-runner:$(hadoop_version) --build-arg OPENJDK_VERSION=21-jdk --build-arg OPENJDK_VERSION_HADOOP=11-jdk ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
-	else
-		docker build -t remstef/hadoop-runner:$(hadoop_version) ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
-	endif
+ifeq ($(hadoop_version),3)
+	docker build -t remstef/hadoop-runner:$(hadoop_version) --build-arg OPENJDK_VERSION=21-jdk --build-arg OPENJDK_VERSION_HADOOP=11-jdk ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+else
+	docker build -t remstef/hadoop-runner:$(hadoop_version) ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+endif
 
 build-hadoop: build-hadoop-runner
 	docker build -t remstef/hadoop$(hadoop_version) ./hadoop-docker-hadoop-$(hadoop_version)
@@ -100,18 +100,18 @@ compose-headnodeid: check-file
 	@echo $(headnode) container id: $(HEADNODE_CONTAINER)	
 
 run-jbt-test:
-	ifndef HEADNODE_CONTAINER
-		@echo ""
-		@echo "Headnode container ID is not specified."
-		@echo "Run"
-		@echo "  make run-jbt-test HEADNODE_CONTAINER=<container-id>"
-		@echo "or"
-		@echo "  make {h2,h3} compose-runtest"
-		@echo "or"
-		@echo "  make {h3-swarm-explicit} stack-runtest"
-		@echo ""
-		@exit 1
-	endif
+ifndef HEADNODE_CONTAINER
+	@echo ""
+	@echo "Headnode container ID is not specified."
+	@echo "Run"
+	@echo "  make run-jbt-test HEADNODE_CONTAINER=<container-id>"
+	@echo "or"
+	@echo "  make {h2,h3} compose-runtest"
+	@echo "or"
+	@echo "  make {h3-swarm-explicit} stack-runtest"
+	@echo ""
+	@exit 1
+endif
 	docker exec $(HEADNODE_CONTAINER) hdfs dfs -mkdir -p /user/hadoop/mouse \
 	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $(HEADNODE_CONTAINER) hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
 	  ; RUNSCRIPT=$$(docker exec $(HEADNODE_CONTAINER) python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
