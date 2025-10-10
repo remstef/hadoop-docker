@@ -19,13 +19,14 @@ SHELL := /bin/bash
 # Default compose file if none specified
 file ?= docker-compose.yml
 
+# Default hadoop version
+hadoop_version ?= 3
+
 # Default headnode name
 headnode ?= namenode
 
-# # Default Docker images
-# img_hadoop_runner ?: remstef/hadoop-runner:3
-# img_hadoop ?: remstef/hadoop3
-# img_hadoop_jobimtext ?: rremstef/hadoop3-jobimtext
+# Default compose file if none specified
+stack ?= jbth3
 
 # default target
 list-targets: 
@@ -33,87 +34,93 @@ list-targets:
 	@make -n -p | grep -E -o '^[a-zA-Z0-9_\-]+:' | sed 's/://' | grep -v Makefile | sort
 
 h3:
+	@$(eval hadoop_version := 3)
 	@$(eval file := docker-compose-hadoop3-jobimtext.yml)
 	@echo "Set compose file to: $(file)"
 
 h2:
+	@$(eval hadoop_version := 3)
 	@$(eval file := docker-compose-hadoop2-jobimtext.yml)
-	@echo "Set compose file to: $(file)"
+	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
-build-hadoop2-runner:
-	docker build -t remstef/hadoop-runner:2 ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+h3-swarm-explicit:
+	@$(eval hadoop_version := 3)
+	@$(eval file := docker-compose-h3-jobimtext-swarm-explicit.yml)
 
-build-hadoop3-runner:
-	docker build -t remstef/hadoop-runner:3 --build-arg OPENJDK_VERSION=21-jdk --build-arg OPENJDK_VERSION_HADOOP=11-jdk ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+check-file:
+	@if [ ! -f "$(file)" ]; then \
+		echo "Error: File '$(file)' does not exist"; \
+		exit 1; \
+	fi; \
+	echo "File '$(file)' exists"
 
-build-hadoop2: build-hadoop2-runner
-	docker build -t remstef/hadoop2 ./hadoop-docker-hadoop-2
+build-hadoop-runner:
+	ifeq ($(hadoop_version),3)
+		docker build -t remstef/hadoop-runner:$(hadoop_version) --build-arg OPENJDK_VERSION=21-jdk --build-arg OPENJDK_VERSION_HADOOP=11-jdk ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+	else
+		docker build -t remstef/hadoop-runner:$(hadoop_version) ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+	endif
 
-build-hadoop3: build-hadoop3-runner
-	docker build -t remstef/hadoop3 ./hadoop-docker-hadoop-3
+build-hadoop: build-hadoop-runner
+	docker build -t remstef/hadoop$(hadoop_version) ./hadoop-docker-hadoop-$(hadoop_version)
 
-build-hadoop2-jobimtext: build-hadoop2
-	docker build -t remstef/hadoop2-jobimtext --build-arg HADOOP_VERSION=2 ./hadoop-docker-hadoop-jobimtext
+build-hadoop-jobimtext: build-hadoop
+	docker build -t remstef/hadoop$(hadoop_version)-jobimtext --build-arg HADOOP_VERSION=$(hadoop_version) ./hadoop-docker-hadoop-jobimtext
 
-build-hadoop3-jobimtext: build-hadoop3
-	docker build -t remstef/hadoop3-jobimtext --build-arg HADOOP_VERSION=3 ./hadoop-docker-hadoop-jobimtext
+push-hadoop: build-hadoop
+	docker push remstef/hadoop$(hadoop_version)
 
-pull-hadoop3:
-	docker pull remstef/hadoop3
-	docker pull remstef/hadoop3-jobimtext
+push-hadoop-jobimtext: build-hadoop-jobimtext
+	docker push remstef/hadoop$(hadoop_version)-jobimtext
 
-compose-h2-up:
-	docker compose -f docker-compose-hadoop2-jobimtext.yml up -d
+pull-hadoop:
+	docker pull remstef/hadoop$(hadoop_version)
+	docker pull remstef/hadoop$(hadoop_version)-jobimtext
 
-compose-h3-up:
-	docker compose -f docker-compose-hadoop3-jobimtext.yml up -d
-
-compose-up:
+compose-up: check-file
 	docker compose -f $(file) up -d
 
-compose-h2-runtest:
-	NAMENODE=$$(docker compose -f docker-compose-hadoop2-jobimtext.yml ps namenode -q) \
-	  && echo Namenode container id: $${NAMENODE} \
-	  && docker exec $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
-	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  ; RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
-	  && echo scriptfile: $${RUNSCRIPT} \
-	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
-		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
+compose-status: check-file
+	docker compose -f $(file) ps -a
 
-compose-h3-runtest:
-	NAMENODE=$$(docker compose -f docker-compose-hadoop3-jobimtext.yml ps namenode -q) \
-	  && echo Namenode container id: $${NAMENODE} \
-	  && docker exec $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
-	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  ; RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
-	  && echo scriptfile: $${RUNSCRIPT} \
-	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
-		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
+compose-stats: check-file
+	docker compose -f $(file) stats
 
-compose-runtest:
-	HEADNODE=$$(docker compose -f $(file) ps $(headnode) -q) \
-	  && echo headnode container id: $${HEADNODE} \
-	  && docker exec $${HEADNODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
-	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${HEADNODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  ; RUNSCRIPT=$$(docker exec $${HEADNODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
-	  && echo scriptfile: $${RUNSCRIPT} \
-	  && time docker exec -it $${HEADNODE} sh $${RUNSCRIPT} \
-		; docker exec $${HEADNODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
-
-compose-down:
-	docker compose -f docker-compose-hadoop2-jobimtext.yml down
-	docker compose -f docker-compose-hadoop3-jobimtext.yml down
+compose-down: check-file
 	docker compose -f $(file) down
 
-compose-attach:
-	sh attach-containers.sh
+compose-attach-headnode: check-file compose-headnodeid
+	docker exec -ti $(HEADNODE_CONTAINER) bash
 
-push-hadoop3: build-hadoop3
-	docker push remstef/hadoop3
+compose-attach-all: check-file
+	sh attach-containers.sh $(file)
 
-push-hadoop3-jobimtext: build-hadoop3-jobimtext
-	docker push remstef/hadoop3-jobimtext
+compose-headnodeid: check-file
+	@$(eval export HEADNODE_CONTAINER := $(shell docker compose -f $(file) ps $(headnode) -q))
+	@echo $(headnode) container id: $(HEADNODE_CONTAINER)	
+
+run-jbt-test:
+	ifndef HEADNODE_CONTAINER
+		@echo ""
+		@echo "Headnode container ID is not specified."
+		@echo "Run"
+		@echo "  make run-jbt-test HEADNODE_CONTAINER=<container-id>"
+		@echo "or"
+		@echo "  make {h2,h3} compose-runtest"
+		@echo "or"
+		@echo "  make {h3-swarm-explicit} stack-runtest"
+		@echo ""
+		@exit 1
+	endif
+	docker exec $(HEADNODE_CONTAINER) hdfs dfs -mkdir -p /user/hadoop/mouse \
+	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $(HEADNODE_CONTAINER) hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
+	  ; RUNSCRIPT=$$(docker exec $(HEADNODE_CONTAINER) python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
+	  && echo scriptfile: $${RUNSCRIPT} \
+	  && time docker exec -it $(HEADNODE_CONTAINER) sh $${RUNSCRIPT} \
+		; docker exec $(HEADNODE_CONTAINER) hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
+
+compose-runtest: compose-headnodeid
+	$(MAKE) run-jbt-test
 
 swarm-init-info:
 	@echo "==== ==== ==== ===="
@@ -167,33 +174,26 @@ swarm-status:
 	docker node ls --format '{{.Hostname}}' | while read h; do echo "$${h}:"; docker node inspect $${h} -f '{{ range $$k, $$v := .Spec.Labels }}  {{ $$k }}={{ $$v }}  {{ end }}'; done
 	@echo ""
 
-swarm-stack-deploy:
-	docker stack deploy --compose-file docker-compose-h3-jobimtext-swarm-explicit.yml jbth3
+stack-deploy:
+	docker stack deploy --compose-file $(file) $(stack)
 
-swarm-stack-rm:
-	docker stack rm jbth3
+stack-rm:
+	docker stack rm $(stack)
 
-swarm-stack-namenode:
-	NAMENODE=$$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1)) \
-		&& echo Namenode container id: \
-		&& echo $${NAMENODE}
+stack-headnodeid:
+# 	HEADNODE_CONTAINER := $$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q $(stack)_$(headnode) | head -n1)) \
+# 		&& echo Namenode container id: \
+# 		&& echo $${HEADNODE_CONTAINER}
+	@$(eval export HEADNODE_CONTAINER := $(shell docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $(shell docker service ps -q $(stack)_$(headnode) | head -n1)))
+	@echo $(headnode) container id: $(HEADNODE_CONTAINER)	
 
-swarm-stack-attach-namenode:
-	NAMENODE=$$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1)) \
-	  && echo Namenode container id: $${NAMENODE} \
-	  && docker exec -ti $${NAMENODE} bash
+stack-attach-headnode: swarm-stack-headnodeid
+	docker exec -ti $${HEADNODE_CONTAINER} bash
 
-swarm-stack-runtest:
-	NAMENODE=$$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q jbth3_namenode | head -n1)) \
-	  && echo Namenode container id: $${NAMENODE} \
-	  && docker exec $${NAMENODE} hdfs dfs -mkdir -p /user/hadoop/mouse \
-	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $${NAMENODE} hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  ; RUNSCRIPT=$$(docker exec $${NAMENODE} python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
-	  && echo scriptfile: $${RUNSCRIPT} \
-	  && time docker exec -it $${NAMENODE} sh $${RUNSCRIPT} \
-		; docker exec $${NAMENODE} hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
+stack-runtest: stack-headnodeid 
+	$(MAKE) run-jbt-test
 
-swarm-stack-status:
+stack-status:
 	docker service ls
 	@echo ""
 	@echo "Run the following commands to investigate services:"
@@ -225,3 +225,4 @@ ssh-info:
 	@echo "  http://datanode:9864 (datanode{1-3} in swarm mode)"
 	@echo ""
 
+gateway-info: ssh-info
