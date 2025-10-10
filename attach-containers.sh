@@ -1,31 +1,40 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-projname=$(basename $(pwd))
+set -e
 
-if [ -n "$TMUX" ]; then
-  tmux new-window 'bash -c "docker compose -f docker-compose-hadoop3-jobimtext.yml logs -f || echo command failed; exec bash"' \; \
-    split-window -h bash -c "docker exec -ti ${projname}-datanode-1 bash || echo command failed; exec bash" \; \
-    split-window -h bash -c "docker exec -ti ${projname}-resourcemanager-1 bash || echo command failed; exec bash" \; \
-    split-window -h bash -c "docker exec -ti ${projname}-nodemanager-1 bash || echo command failed; exec bash" \; \
-    split-window -h bash -c "docker exec -ti ${projname}-historyserver-1 bash || echo command failed; exec bash" \; \
-    split-window -h bash -c "docker exec -ti ${projname}-namenode-1 bash || echo command failed; exec bash" \; \
-    select-layout tiled \; \
-    rename-window hadoop-containers
-    # setw synchronize-panes on \; \
-else
-  tmux new-session -d -s dockercontainers \
-    'bash -c "docker compose -f docker-compose-hadoop3-jobimtext.yml logs -f || echo command failed; exec bash"' \; \
-    split-window -h bash -c "docker exec -ti ${projname}-datanode-1 bash || echo command failed; exec bash" \; \
-    split-window -h bash -c "docker exec -ti ${projname}-resourcemanager-1 bash || echo command failed; exec bash" \; \
-    split-window -h bash -c "docker exec -ti ${projname}-nodemanager-1 bash || echo command failed; exec bash" \; \
-    split-window -h bash -c "docker exec -ti ${projname}-historyserver-1 bash || echo command failed; exec bash" \; \
-    split-window -h bash -c "docker exec -ti ${projname}-namenode-1 bash || echo command failed; exec bash" \; \
-    select-layout tiled \; \
-    rename-window hadoop-containers \; \
-    attach-session
-    # setw synchronize-panes on \; \
+COMPOSE_FILE=${1:-docker-compose.yml}
+
+echo "Using '${COMPOSE_FILE}'."
+if [ ! -f "${COMPOSE_FILE}" ]; then
+  echo "Error: Compose file '${COMPOSE_FILE}' not found"
+  exit 1
 fi
 
+SERVICES=$(docker compose -f ${COMPOSE_FILE} config --services)
 
+# Prepare TMUX command. 
+# Check if a tmux session exists; open a new 
+# window, or just a new session
+if [ -n "$TMUX" ]; then
+  TMUX_CMD="tmux new-window"
+else
+  TMUX_CMD="tmux new-session"
+fi
 
+# Start with logs window
+TMUX_CMD+=" 'bash -c \"docker compose -f ${COMPOSE_FILE} logs -f || echo command failed; exec bash\"'"
 
+# Add a split pane for each service
+i=0
+for service in ${SERVICES}; do
+  # alternate splitting vertically and horizontically
+  split=$([ $((i % 2)) -eq 0 ] && echo "-h" || echo "-v")
+  TMUX_CMD+=" \\; split-window ${split} 'bash -c \"docker exec -ti \$(docker compose -f ${COMPOSE_FILE} ps -q ${service}) bash || echo command failed; exec bash\"'"
+  i=$((i + 1))
+done
+
+# Add final layout commands
+TMUX_CMD+=" \\; select-layout tiled \\; rename-window hadoop-containers"
+
+# Execute the constructed command
+eval "${TMUX_CMD}"
