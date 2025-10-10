@@ -18,6 +18,7 @@ services:
       - hadoopnet
     ports:
       - 9870:9870
+      - 2222:22
     env_file:
       - ./config-hadoop3.env
     environment:

@@ -27,6 +27,7 @@ ENV PATH="$PATH:/opt/pig/bin"
 ENV PIG_HOME=/opt/pig
 ENV PIG_CLASSPATH=/opt/hadoop/conf
 
+# install spark
 ARG SPARK_URL=https://dlcdn.apache.org/spark/spark-4.0.1/spark-4.0.1-bin-without-hadoop.tgz
 RUN curl -LSs -o spark.tar.gz $SPARK_URL && tar zxf spark.tar.gz && rm spark.tar.gz && ln -s spark* spark && chown -R hadoop:users /opt/spark
 ENV PATH="$PATH:/opt/spark/bin"
@@ -39,15 +40,17 @@ RUN echo "export JAVA_HOME=/opt/java/openjdk-${OPENJDK_VERSION}" > spark/conf/sp
     && echo "spark.executorEnv.JAVA_HOME=/opt/java/openjdk-${OPENJDK_VERSION}" >> spark/conf/spark-defaults.conf
   # && echo "spark.eventLog.dir file://${SPARK_HOME}/event_logs" >> $SPARK_HOME/conf/spark-defaults.conf \
 
+# install jobimtext
 ARG JOBIMTEXT_URL=http://ltdata1.informatik.uni-hamburg.de/jobimtext-resources/jobimtext.p/jobimtext_pipeline_0.1.5beta.tar.gz
 RUN curl -LSs -o jobimtext.tar.gz $JOBIMTEXT_URL && tar zxf jobimtext.tar.gz && rm jobimtext.tar.gz && ln -s jobimtext* jobimtext && chown -R hadoop:users /opt/jobimtext
 RUN apt update -q \
     && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
       python2 \
+      openssh-server \
       unzip \
     && apt clean
 
-    # python-setuptools
+# python-setuptools
 ARG PYTHON_SETUPTOOLS_URL=https://files.pythonhosted.org/packages/b2/40/4e00501c204b457f10fe410da0c97537214b2265247bc9a5bc6edd55b9e4/setuptools-44.1.1.zip
 RUN curl -LSs -o setuptools.zip $PYTHON_SETUPTOOLS_URL \
     && unzip setuptools.zip \
@@ -57,6 +60,7 @@ RUN curl -LSs -o setuptools.zip $PYTHON_SETUPTOOLS_URL \
     && cd .. \
     && rm -rf setuptools*
 
+# python argparse
 ARG PYTHON_ARGPARSE_URL=https://files.pythonhosted.org/packages/18/dd/e617cfc3f6210ae183374cd9f6a26b20514bbb5a792af97949c5aacddf0f/argparse-1.4.0.tar.gz
 RUN curl -LSs -o argparse.tar.gz $PYTHON_ARGPARSE_URL \
     && tar zxf argparse.tar.gz \
@@ -66,8 +70,30 @@ RUN curl -LSs -o argparse.tar.gz $PYTHON_ARGPARSE_URL \
     && cd .. \
     && rm -rf argparse*
 
+# configure openssh server
+RUN mkdir -p /var/run/sshd \
+    && mkdir -p /run/sshd \
+    && echo "hadoop:hadoop" | chpasswd \
+    && chsh -s /bin/bash hadoop \
+    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config \
+    && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config \
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+    && sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config \
+    && sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config \
+    && sed -i 's/#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/' /etc/ssh/sshd_config \
+    && sed -i 's/#Protocol 2/Protocol 2/' /etc/ssh/sshd_config \
+    && sed -i 's/#AllowTcpForwarding yes/AllowTcpForwarding yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#PermitTunnel no/PermitTunnel yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#GatewayPorts no/GatewayPorts yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 60/' /etc/ssh/sshd_config \
+    && sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' /etc/ssh/sshd_config \
+    && echo "AllowUsers hadoop" >> /etc/ssh/sshd_config
+
+EXPOSE 22
+
 RUN bash -c 'echo "shopt -s globstar" >> /etc/bashrc'
 RUN bash -c 'echo "[ -n \"\$BASH_VERSION\" ] && shopt -s globstar" >> /etc/profile'
 
 WORKDIR /opt/jobimtext
+
 USER hadoop
