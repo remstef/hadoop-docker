@@ -5,14 +5,16 @@ networks:
 
 services:
 
-  namenode:
+  headnode:
     image: remstef/hadoop3-jobimtext
-    hostname: namenode
+    hostname: headnode
     command: >-
       /bin/bash -c "
-        hdfs namenode & sleep 1 &&
-        yarn resourcemanager & sleep 1 &&
-        mapred historyserver & wait
+        hdfs namenode & 
+        sleep 1 && yarn resourcemanager &
+        sleep 1 && mapred historyserver & 
+        sleep 1 && sudo /usr/sbin/sshd -D & 
+        wait
       "
     networks:
       hadoopnet:
@@ -23,6 +25,7 @@ services:
     ports:
       - 9870:9870
       - 8088:8088
+      - 2222:22
     env_file:
       - ./config-hadoop3.env
     environment:
