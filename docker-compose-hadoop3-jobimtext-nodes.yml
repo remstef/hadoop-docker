@@ -16,6 +16,9 @@ services:
         sleep 1 && sudo /usr/sbin/sshd -D & 
         wait
       "
+    volumes:
+      # pass authorized_keys for quicker login
+      - ~/.ssh/id_ed25519.pub:/opt/hadoop/.ssh/authorized_keys:ro
     networks:
       hadoopnet:
         aliases: 

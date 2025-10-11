@@ -76,7 +76,7 @@ RUN mkdir -p /var/run/sshd \
     && echo "hadoop:hadoop" | chpasswd \
     && chsh -s /bin/bash hadoop \
     && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config \
-    && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config \
+    && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config \
     && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
     && sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config \
     && sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config \
