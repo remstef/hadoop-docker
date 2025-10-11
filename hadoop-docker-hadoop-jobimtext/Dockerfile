@@ -87,7 +87,8 @@ RUN mkdir -p /var/run/sshd \
     && sed -i 's/#GatewayPorts no/GatewayPorts yes/' /etc/ssh/sshd_config \
     && sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 60/' /etc/ssh/sshd_config \
     && sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' /etc/ssh/sshd_config \
-    && echo "AllowUsers hadoop" >> /etc/ssh/sshd_config
+    && echo "AllowUsers hadoop" >> /etc/ssh/sshd_config \
+    && echo "ForceCommand cd /opt/jobimtext && exec bash -l" >> /etc/ssh/sshd_config
 
 EXPOSE 22
 
