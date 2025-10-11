@@ -70,7 +70,7 @@ RUN curl -LSs -o argparse.tar.gz $PYTHON_ARGPARSE_URL \
     && cd .. \
     && rm -rf argparse*
 
-# # configure openssh server
+# configure openssh server
 RUN mkdir -p /var/run/sshd \
     && mkdir -p /run/sshd \
     && echo "hadoop:hadoop" | chpasswd \
