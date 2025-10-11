@@ -121,7 +121,7 @@ ifndef HEADNODE_CONTAINER
 endif
 	docker exec $(HEADNODE_CONTAINER) hdfs dfs -mkdir -p /user/hadoop/mouse \
 	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $(HEADNODE_CONTAINER) hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  ; RUNSCRIPT=$$(docker exec $(HEADNODE_CONTAINER) python2 generateHadoopScript.py -hl trigram -nb mouse | tail -n1) \
+	  ; RUNSCRIPT=$$(docker exec $(HEADNODE_CONTAINER) python2 generateHadoopScript.py -f 1 -w 3 -wf 1 -p 100 -wpfmin 1 -l 20 -af -nb -hl trigram -hm 5 -lines 1000 mouse | tail -n1) \
 	  && echo scriptfile: $${RUNSCRIPT} \
 	  && time docker exec -it $(HEADNODE_CONTAINER) sh $${RUNSCRIPT} \
 		; docker exec $(HEADNODE_CONTAINER) hdfs dfs -text mouse_trigram__FreqSigLMI__PruneContext_s_0.0_w_2_f_2_wf_2_wpfmax_1000_wpfmin_2_p_1000__AggrPerFt__SimCount_sc_log_scored_ac_False__SimSort_v2limit_200_minsim_2/* | grep "^mouse" | head -n 10
