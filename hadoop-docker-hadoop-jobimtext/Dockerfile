@@ -70,24 +70,24 @@ RUN curl -LSs -o argparse.tar.gz $PYTHON_ARGPARSE_URL \
     && cd .. \
     && rm -rf argparse*
 
-# configure openssh server
+# # configure openssh server
 RUN mkdir -p /var/run/sshd \
     && mkdir -p /run/sshd \
     && echo "hadoop:hadoop" | chpasswd \
     && chsh -s /bin/bash hadoop \
-    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config \
-    && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config \
-    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
     && sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config \
-    && sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config \
-    && sed -i 's/#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/' /etc/ssh/sshd_config \
-    && sed -i 's/#Protocol 2/Protocol 2/' /etc/ssh/sshd_config \
-    && sed -i 's/#AllowTcpForwarding yes/AllowTcpForwarding yes/' /etc/ssh/sshd_config \
-    && sed -i 's/#PermitTunnel no/PermitTunnel yes/' /etc/ssh/sshd_config \
-    && sed -i 's/#GatewayPorts no/GatewayPorts yes/' /etc/ssh/sshd_config \
-    && sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 60/' /etc/ssh/sshd_config \
-    && sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 3/' /etc/ssh/sshd_config \
+    && echo "PermitRootLogin no" >> /etc/ssh/sshd_config \
+    && echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config \
+    && echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config \
+    && echo "Port 22" >> /etc/ssh/sshd_config \
+    && echo "Protocol 2" >> /etc/ssh/sshd_config \
+    && echo "AllowTcpForwarding yes" >> /etc/ssh/sshd_config \
+    && echo "PermitTunnel yes" >> /etc/ssh/sshd_config \
+    && echo "GatewayPorts yes" >> /etc/ssh/sshd_config \
+    && echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config \
+    && echo "ClientAliveCountMax 3" >> /etc/ssh/sshd_config \
     && echo "AllowUsers hadoop" >> /etc/ssh/sshd_config \
+    && echo 'ListenAddress 0.0.0.0' >> /etc/ssh/sshd_config \
     && echo "ForceCommand cd /opt/jobimtext && exec bash -l" >> /etc/ssh/sshd_config
 
 EXPOSE 22
