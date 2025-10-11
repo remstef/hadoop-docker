@@ -124,8 +124,9 @@ endif
 	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $(HEADNODE_CONTAINER) hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
 	  ; RUNSCRIPT=$$(docker exec $(HEADNODE_CONTAINER) python2 generateHadoopScript.py -f 1 -w 3 -wf 1 -p 100 -wpfmin 1 -l 20 -af -nb -hl trigram -hm 5 -lines 1000 mouse | tail -n1) \
 	  && echo scriptfile: $${RUNSCRIPT} \
-		&& HDFSOUTDIR=$$(cat $${RUNSCRIPT} | tail -n 1 | grep -o -E "OUT=[^ ]*" | sed 's/OUT=//') \
-	  && time docker exec -it $(HEADNODE_CONTAINER) sh $${RUNSCRIPT} \
+		&& HDFSOUTDIR=$$(docker exec cat $(HEADNODE_CONTAINER) $${RUNSCRIPT} | tail -n 1 | grep -o -E "OUT=[^ ]*" | sed 's/OUT=//') \
+		&& echo scriptfile: $${HDFSOUTDIR} \
+	  && time docker exec $(HEADNODE_CONTAINER) sh $${RUNSCRIPT} \
 		; docker exec $(HEADNODE_CONTAINER) hdfs dfs -text "${HDFSOUTDIR}/*" | grep "^mouse" | head -n 10
 
 compose-runtest: compose-headnodeid
