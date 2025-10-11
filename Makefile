@@ -47,6 +47,7 @@ h3:
 h3-nodes:
 	@$(eval hadoop_version := 3)
 	@$(eval file := compose-h3-nodes.yml)
+	@$(eval headnode := headnode)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
 h3-swarm:
