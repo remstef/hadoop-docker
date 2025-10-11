@@ -33,19 +33,26 @@ list-targets:
 	@echo "Available targets: (run with make <target-name>)"
 	@make -n -p | grep -E -o '^[a-zA-Z0-9_\-]+:' | sed 's/://' | grep -v Makefile | sort
 
+h2:
+	@$(eval hadoop_version := 2)
+	@$(eval file := compose-h2.yml)
+	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
+	@echo "NOTE: hadoop v2 is a legacy version."
+
 h3:
 	@$(eval hadoop_version := 3)
-	@$(eval file := docker-compose-hadoop3-jobimtext.yml)
-	@echo "Set compose file to: $(file)"
+	@$(eval file := compose-h3.yml)
+	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
-h2:
+h3-nodes:
 	@$(eval hadoop_version := 3)
-	@$(eval file := docker-compose-hadoop2-jobimtext.yml)
+	@$(eval file := compose-h3-nodes.yml)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
 h3-swarm-explicit:
 	@$(eval hadoop_version := 3)
-	@$(eval file := docker-compose-h3-jobimtext-swarm-explicit.yml)
+	@$(eval file := compose-h3-swarm-explicit.yml)
+	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
 check-file:
 	@if [ ! -f "$(file)" ]; then \
