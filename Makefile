@@ -49,9 +49,9 @@ h3-nodes:
 	@$(eval file := compose-h3-nodes.yml)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
-h3-swarm-explicit:
+h3-swarm:
 	@$(eval hadoop_version := 3)
-	@$(eval file := compose-h3-swarm-explicit.yml)
+	@$(eval file := compose-h3-swarm.yml)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
 check-file:
@@ -115,7 +115,7 @@ ifndef HEADNODE_CONTAINER
 	@echo "or"
 	@echo "  make {h2,h3} compose-runtest"
 	@echo "or"
-	@echo "  make {h3-swarm-explicit} stack-runtest"
+	@echo "  make {h3-swarm} stack-runtest"
 	@echo ""
 	@exit 1
 endif
@@ -156,8 +156,8 @@ swarm-init-info:
 	@echo ""
 	@echo "    docker node update --label-add hadooprole=worker{i} <docker-node-name>"
 	@echo ""
-	@echo "The example 'docker-compose-h3-jobimtext-swarm-explicit.yml' file expects 4 labelled nodes"
-	@echo "(master, worker1, worker2, worker3) which should ideally be different physical machines."
+	@echo "The example 'compose-h3-swarm.yml' file expects 4 labelled nodes"
+	@echo "(master, worker1, worker2, worker3) which are supposed to be different physical machines."
 	@echo ""
 	@echo "Check the status with: "
 	@echo ""
