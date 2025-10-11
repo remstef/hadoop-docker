@@ -30,7 +30,7 @@ services:
       - 8088:8088
       - 2222:22
     env_file:
-      - ./config-hadoop3.env
+      - ./config-h3.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
 
@@ -48,7 +48,7 @@ services:
           - datanode
           - nodemanager
     env_file:
-      - ./config-hadoop3.env
+      - ./config-h3.env
     environment:
       - SLEEP_SECONDS=5
       - WAITFOR=namenode:8020

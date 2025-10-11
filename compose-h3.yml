@@ -20,7 +20,7 @@ services:
       - 9870:9870
       - 2222:22
     env_file:
-      - ./config-hadoop3.env
+      - ./config-h3.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
 
@@ -34,7 +34,7 @@ services:
     networks:
       - hadoopnet
     env_file:
-      - ./config-hadoop3.env
+      - ./config-h3.env
   
   resourcemanager:
     <<: *hadoopref

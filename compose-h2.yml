@@ -15,7 +15,7 @@ services:
     #   dockerfile: Dockerfile
     command: ["hdfs", "datanode"]
     env_file:
-      - ./config-hadoop2.env
+      - ./config-h2.env
     networks:
       - hadoopnet
 
@@ -31,7 +31,7 @@ services:
     ports:
       - 50070:50070
     env_file:
-      - ./config-hadoop2.env
+      - ./config-h2.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
     networks:

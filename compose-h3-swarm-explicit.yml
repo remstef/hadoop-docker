@@ -32,7 +32,7 @@ services:
   namenode:
     image: remstef/hadoop3-jobimtext
     env_file:
-      - ./config-hadoop3-swarm.env
+      - ./config-h3-swarm.env
     hostname: namenode
     command: ["hdfs", "namenode"]
     environment:
@@ -49,7 +49,7 @@ services:
   datanode1:
     image: remstef/hadoop3
     env_file:
-      - ./config-hadoop3-swarm.env
+      - ./config-h3-swarm.env
     hostname: datanode1
     command: ["hdfs", "datanode"]
     networks:
@@ -64,7 +64,7 @@ services:
   datanode2:
     image: remstef/hadoop3
     env_file:
-      - ./config-hadoop3-swarm.env
+      - ./config-h3-swarm.env
     hostname: datanode2
     command: ["hdfs", "datanode"]
     networks:
@@ -79,7 +79,7 @@ services:
   datanode3:
     image: remstef/hadoop3
     env_file:
-      - ./config-hadoop3-swarm.env
+      - ./config-h3-swarm.env
     hostname: datanode3
     command: ["hdfs", "datanode"]
     networks:
@@ -94,7 +94,7 @@ services:
   resourcemanager:
     image: remstef/hadoop3
     env_file:
-      - ./config-hadoop3-swarm.env
+      - ./config-h3-swarm.env
     hostname: resourcemanager
     command: ["yarn", "resourcemanager"]
     networks:
@@ -109,7 +109,7 @@ services:
   nodemanager1:
     image: remstef/hadoop3
     env_file:
-      - ./config-hadoop3-swarm.env
+      - ./config-h3-swarm.env
     hostname: nodemanager1
     command: ["yarn", "nodemanager"]
     networks:
@@ -124,7 +124,7 @@ services:
   nodemanager2:
     image: remstef/hadoop3
     env_file:
-      - ./config-hadoop3-swarm.env
+      - ./config-h3-swarm.env
     hostname: nodemanager2
     command: ["yarn", "nodemanager"]
     networks:
@@ -139,7 +139,7 @@ services:
   nodemanager3:
     image: remstef/hadoop3
     env_file:
-      - ./config-hadoop3-swarm.env
+      - ./config-h3-swarm.env
     hostname: nodemanager3
     command: ["yarn", "nodemanager"]
     networks:
@@ -154,7 +154,7 @@ services:
   historyserver:
     image: remstef/hadoop3
     env_file:
-      - ./config-hadoop3-swarm.env
+      - ./config-h3-swarm.env
     hostname: historyserver
     command: ["mapred", "historyserver"]
     networks:
