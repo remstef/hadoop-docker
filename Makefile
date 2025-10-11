@@ -127,7 +127,7 @@ endif
 		&& HDFSOUTDIR=$$(docker exec $(HEADNODE_CONTAINER) cat $${RUNSCRIPT} | tail -n 1 | grep -o -E "OUT=[^ ]*" | sed 's/OUT=//') \
 		&& echo hdfs output directory: $${HDFSOUTDIR} \
 	  && time docker exec $(HEADNODE_CONTAINER) sh $${RUNSCRIPT} \
-		; docker exec $(HEADNODE_CONTAINER) hdfs dfs -text "${HDFSOUTDIR}/*" | grep "^mouse" | head -n 10
+		; docker exec $(HEADNODE_CONTAINER) hdfs dfs -text "$${HDFSOUTDIR}/*" | grep "^mouse" | head -n 10
 
 compose-runtest: compose-headnodeid
 	$(MAKE) run-jbt-test
