@@ -252,9 +252,9 @@ gateway-info: ssh-info
 # make ssh-connect ssh_extra_args=-v 
 ssh-connect:
 	@echo "SSH extra args: $(ssh_extra_args)"
-	ssh $(ssh_extra_args) -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@::
+	ssh $(ssh_extra_args) -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@0.0.0.0
 
 ssh-connect-proxy:
 	@echo "SSH extra args: $(ssh_extra_args)"
-	ssh $(ssh_extra_args) -D 1080 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@::
+	ssh $(ssh_extra_args) -D 1080 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@0.0.0.0
 
