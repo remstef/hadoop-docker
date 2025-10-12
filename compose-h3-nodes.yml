@@ -11,7 +11,7 @@ services:
     command: >-
       /bin/bash -c "
         ssh-server & 
-        sleep 1 && hdfs namenode & 
+        hdfs namenode & 
         sleep 2 && yarn resourcemanager &
         sleep 3 && mapred historyserver & 
         wait
