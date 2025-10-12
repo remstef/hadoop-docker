@@ -51,7 +51,7 @@ services:
       - ./config-h3-nodes-swarm.env
     environment:
       - SLEEP_SECONDS=5
-      - WAITFOR=namenode:8020
+      - WAITFOR=headnode:8020
     networks:
       - hadoopnet
     deploy:
