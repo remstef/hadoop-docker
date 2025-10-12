@@ -60,7 +60,6 @@ check-file:
 		echo "Error: File '$(file)' does not exist"; \
 		exit 1; \
 	fi; \
-	echo "File '$(file)' exists"
 
 build-hadoop-runner:
 ifeq ($(hadoop_version),3)
@@ -240,3 +239,13 @@ ssh-info:
 	@echo ""
 
 gateway-info: ssh-info
+
+# make ssh-connect ssh_extra_args=-v 
+ssh-connect:
+	@echo "SSH extra args: $(ssh_extra_args)"
+	ssh $(ssh_extra_args) -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@::
+
+ssh-connect-proxy:
+	@echo "SSH extra args: $(ssh_extra_args)"
+	ssh $(ssh_extra_args) -D 1080 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@::
+

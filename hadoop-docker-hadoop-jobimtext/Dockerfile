@@ -88,12 +88,15 @@ RUN mkdir -p /var/run/sshd \
     && echo "ClientAliveCountMax 3" >> /etc/ssh/sshd_config \
     && echo "AllowUsers hadoop" >> /etc/ssh/sshd_config \
     && echo 'ListenAddress 0.0.0.0' >> /etc/ssh/sshd_config \
+    && echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config \
     && echo "ForceCommand cd /opt/jobimtext && exec bash -l" >> /etc/ssh/sshd_config
 
 EXPOSE 22
 
-RUN bash -c 'echo "shopt -s globstar" >> /etc/bashrc'
 RUN bash -c 'echo "[ -n \"\$BASH_VERSION\" ] && shopt -s globstar" >> /etc/profile'
+
+COPY --chown=hadoop --chmod=755 scripts /opt/
+RUN ln -s /opt/ssh-server.sh /usr/local/bin/ssh-server
 
 WORKDIR /opt/jobimtext
 

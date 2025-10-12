@@ -13,7 +13,7 @@ services:
         hdfs namenode & 
         sleep 1 && yarn resourcemanager &
         sleep 1 && mapred historyserver & 
-        sleep 1 && sudo /usr/sbin/sshd -D & 
+        sleep 1 && ssh-server & 
         wait
       "
     volumes:
