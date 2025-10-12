@@ -55,6 +55,12 @@ h3-swarm:
 	@$(eval file := compose-h3-swarm.yml)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
+h3-swarm-nodes:
+	@$(eval hadoop_version := 3)
+	@$(eval file := compose-h3-swarm-nodes.yml)
+	@$(eval headnode := headnode)
+	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
+
 check-file:
 	@if [ ! -f "$(file)" ]; then \
 		echo "Error: File '$(file)' does not exist"; \
