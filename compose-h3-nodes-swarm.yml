@@ -1,7 +1,7 @@
 
 networks:
   hadoopnet:
-    driver: bridge
+    driver: overlay
 
 services:
 
@@ -18,7 +18,7 @@ services:
       "
     volumes:
       # pass authorized_keys for quicker login
-      - ~/.ssh/id_ed25519.pub:/opt/hadoop/.ssh/authorized_keys:ro
+      - ~/.ssh/authorized_keys:/opt/hadoop/.ssh/authorized_keys:ro
     networks:
       hadoopnet:
         aliases: 
@@ -26,15 +26,19 @@ services:
           - resourcemanager
           - historyserver
     ports:
-      - 9870:9870
-      - 8088:8088
       - 2222:22
     env_file:
-      - ./config-h3.env
+      - ./config-h3-swarm.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
+    deploy:
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.hadooprole == master
 
-  node01: &workerref
+  node01: &workernoderef
     image: remstef/hadoop3
     hostname: node01
     command: >-
@@ -42,28 +46,32 @@ services:
         hdfs datanode & sleep 1 &&
         yarn nodemanager & wait
       "
-    networks:
-      - hadoopnet
     env_file:
-      - ./config-h3.env
+      - ./config-h3-swarm.env
     environment:
       - SLEEP_SECONDS=5
       - WAITFOR=namenode:8020
+    networks:
+      - hadoopnet
+    deploy:
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.hadooprole == worker2
 
-  # gatewayserver:
-  #   image: linuxserver/openssh-server
-  #   hostname: gatewayserver
-  #   restart: unless-stopped
-  #   ports:
-  #     - 22222:2222
-  #   networks:
-  #     - hadoopnet
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=UTC
-  #     - USER_NAME=hadoop
-  #     - USER_PASSWORD=hadoop
-  #     - PASSWORD_ACCESS=true
-  #   volumes:
-  #     - ./gatewayserver__sshd_config:/etc/ssh/sshd_config:ro
+  node02:
+    <<: *workernoderef
+    hostname: node02
+    deploy:
+      placement:
+        constraints:
+          - node.labels.hadooprole == worker2
+
+  node03:
+    <<: *workernoderef
+    hostname: node03
+    deploy:
+      placement:
+        constraints:
+          - node.labels.hadooprole == worker3
