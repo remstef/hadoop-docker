@@ -28,7 +28,7 @@ services:
     ports:
       - 2222:22
     env_file:
-      - ./config-h3-swarm.env
+      - ./config-h3-nodes-swarm.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
     deploy:
@@ -43,11 +43,12 @@ services:
     hostname: node01
     command: >-
       /bin/bash -c "
-        hdfs datanode & sleep 1 &&
-        yarn nodemanager & wait
+        hdfs datanode &
+        sleep 1 && yarn nodemanager & 
+        wait
       "
     env_file:
-      - ./config-h3-swarm.env
+      - ./config-h3-nodes-swarm.env
     environment:
       - SLEEP_SECONDS=5
       - WAITFOR=namenode:8020
