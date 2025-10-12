@@ -10,10 +10,10 @@ services:
     hostname: headnode
     command: >-
       /bin/bash -c "
-        hdfs namenode & 
+        ssh-server & 
+        sleep 1 && hdfs namenode & 
         sleep 1 && yarn resourcemanager &
         sleep 1 && mapred historyserver & 
-        sleep 1 && ssh-server & 
         wait
       "
     volumes:

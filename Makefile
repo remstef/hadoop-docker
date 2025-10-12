@@ -86,6 +86,9 @@ pull-hadoop:
 
 compose-up: check-file
 	docker compose -f $(file) up -d
+	# sleep a couple of seconds to give the container some time to start 
+	# before exiting make and potentially invoking the next target
+	@sleep 3
 
 compose-status: check-file
 	docker compose -f $(file) ps -a
