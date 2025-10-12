@@ -51,7 +51,7 @@ services:
       - ./config-h3-nodes-swarm.env
     environment:
       - SLEEP_SECONDS=5
-      - WAITFOR=headnode:8020
+      - WAITFOR=namenode:8020
     networks:
       - hadoopnet
     deploy:
@@ -59,7 +59,7 @@ services:
       placement:
         max_replicas_per_node: 1
         constraints:
-          - node.labels.hadooprole == worker2
+          - node.labels.hadooprole == worker1
 
   node02:
     <<: *workernoderef
