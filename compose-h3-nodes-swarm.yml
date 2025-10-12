@@ -53,7 +53,10 @@ services:
       - SLEEP_SECONDS=5
       - WAITFOR=headnode:8020
     networks:
-      - hadoopnet
+      hadoopnet:
+        aliases: 
+          - datanode01
+          - nodemanager01
     deploy:
       replicas: 1
       placement:
@@ -64,6 +67,11 @@ services:
   node02:
     <<: *workernoderef
     hostname: node02
+    networks:
+      hadoopnet:
+        aliases: 
+          - datanode02
+          - nodemanager02
     deploy:
       placement:
         constraints:
@@ -72,6 +80,11 @@ services:
   node03:
     <<: *workernoderef
     hostname: node03
+    networks:
+      hadoopnet:
+        aliases: 
+          - datanode03
+          - nodemanager03
     deploy:
       placement:
         constraints:
