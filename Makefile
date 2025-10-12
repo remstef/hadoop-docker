@@ -208,9 +208,12 @@ stack-headnodeid:
 stack-attach-headnode: stack-headnodeid
 	docker exec -ti ${HEADNODE_CONTAINER} bash
 
-stack-runtest: stack-headnodeid 
+stack-runtest: stack-headnodeid
 	$(MAKE) run-jbt-test
 
+stack-refreshnodes: stack-headnodeid
+	docker exec $(HEADNODE_CONTAINER) hdfs dfsadmin -refreshNodes
+	
 stack-status:
 	docker service ls
 	@echo ""
