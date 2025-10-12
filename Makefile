@@ -192,21 +192,21 @@ swarm-status:
 	docker node ls --format '{{.Hostname}}' | while read h; do echo "$${h}:"; docker node inspect $${h} -f '{{ range $$k, $$v := .Spec.Labels }}  {{ $$k }}={{ $$v }}  {{ end }}'; done
 	@echo ""
 
-stack-deploy:
+stack-deploy: check-file
 	docker stack deploy --compose-file $(file) $(stack)
 
 stack-rm:
 	docker stack rm $(stack)
 
-stack-headnodeid:
+stack-headnodeid: 
 # 	HEADNODE_CONTAINER := $$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $$(docker service ps -q $(stack)_$(headnode) | head -n1)) \
 # 		&& echo Namenode container id: \
 # 		&& echo $${HEADNODE_CONTAINER}
 	@$(eval export HEADNODE_CONTAINER := $(shell docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $(shell docker service ps -q $(stack)_$(headnode) | head -n1)))
 	@echo $(headnode) container id: $(HEADNODE_CONTAINER)	
 
-stack-attach-headnode: swarm-stack-headnodeid
-	docker exec -ti $${HEADNODE_CONTAINER} bash
+stack-attach-headnode: stack-headnodeid
+	docker exec -ti ${HEADNODE_CONTAINER} bash
 
 stack-runtest: stack-headnodeid 
 	$(MAKE) run-jbt-test
