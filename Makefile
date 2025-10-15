@@ -74,17 +74,33 @@ else
 	docker build -t remstef/hadoop-runner:$(hadoop_version) ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
 endif
 
-build-hadoop: build-hadoop-runner
+push-hadoop-runner:
+	docker push remstef/hadoop-runner:$(hadoop_version)
+
+buildx-push-hadoop-runner:
+ifeq ($(hadoop_version),3)
+	docker buildx build -t remstef/hadoop-runner:$(hadoop_version) --build-arg OPENJDK_VERSION=21-jdk --build-arg OPENJDK_VERSION_HADOOP=11-jdk --platform linux/arm64,linux/amd64 --push ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+else
+	docker buildx build -t remstef/hadoop-runner:$(hadoop_version) --platform linux/arm64,linux/amd64 --push ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+endif
+
+build-hadoop:
 	docker build -t remstef/hadoop$(hadoop_version) ./hadoop-docker-hadoop-$(hadoop_version)
 
-build-hadoop-jobimtext: build-hadoop
-	docker build -t remstef/hadoop$(hadoop_version)-jobimtext --build-arg HADOOP_VERSION=$(hadoop_version) ./hadoop-docker-hadoop-jobimtext
-
-push-hadoop: build-hadoop
+push-hadoop:
 	docker push remstef/hadoop$(hadoop_version)
 
-push-hadoop-jobimtext: build-hadoop-jobimtext
+buildx-push-hadoop:
+	docker buildx build -t remstef/hadoop$(hadoop_version)  --platform linux/arm64,linux/amd64 --push ./hadoop-docker-hadoop-$(hadoop_version)
+
+build-hadoop-jobimtext:
+	docker build -t remstef/hadoop$(hadoop_version)-jobimtext --build-arg HADOOP_VERSION=$(hadoop_version) ./hadoop-docker-hadoop-jobimtext
+
+push-hadoop-jobimtext:
 	docker push remstef/hadoop$(hadoop_version)-jobimtext
+
+buildx-push-hadoop-jobimtext:
+	docker buildx build -t remstef/hadoop$(hadoop_version)-jobimtext --build-arg HADOOP_VERSION=$(hadoop_version) --platform linux/arm64,linux/amd64 --push ./hadoop-docker-hadoop-jobimtext
 
 pull-hadoop:
 	docker pull remstef/hadoop$(hadoop_version)
@@ -193,7 +209,7 @@ swarm-status:
 	@echo ""
 
 stack-deploy: check-file
-	docker stack deploy --compose-file $(file) $(stack)
+	docker stack deploy -c $(file) -d --prune $(stack)
 
 stack-rm:
 	docker stack rm $(stack)
@@ -215,7 +231,10 @@ stack-refreshnodes: stack-headnodeid
 	docker exec $(HEADNODE_CONTAINER) hdfs dfsadmin -refreshNodes
 	
 stack-status:
+	@echo "Services"
 	docker service ls
+	@echo ""
+	docker service ps --no-trunc $$(docker service ls -q)
 	@echo ""
 	@echo "Run the following commands to investigate services:"
 	@echo "  docker service ps <service-name>"

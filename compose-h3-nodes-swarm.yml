@@ -16,9 +16,6 @@ services:
         sleep 3 && mapred historyserver & 
         wait
       "
-    volumes:
-      # pass authorized_keys for quicker login
-      - ~/.ssh/authorized_keys:/opt/hadoop/.ssh/authorized_keys:ro
     networks:
       hadoopnet:
         aliases: 
@@ -31,6 +28,8 @@ services:
       - ./config-h3-nodes-swarm.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
+      SSH_USER_PASSWORD: x
+
     deploy:
       replicas: 1
       placement:

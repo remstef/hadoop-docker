@@ -33,6 +33,7 @@ services:
       - ./config-h3.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
+      SSH_USER_PASSWORD: x
 
   node01: &workerref
     image: remstef/hadoop3

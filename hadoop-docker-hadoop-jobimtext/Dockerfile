@@ -22,14 +22,24 @@ WORKDIR /opt
 
 # install pig
 ARG PIG_URL=https://dlcdn.apache.org/pig/latest/pig-0.18.0.tar.gz
-RUN curl -LSs -o pig.tar.gz $PIG_URL && tar zxf pig.tar.gz && rm pig.tar.gz && ln -s pig* pig && chown -R hadoop:users /opt/pig
+RUN curl -LSs -o pig.tar.gz $PIG_URL \
+    && tar zxf pig.tar.gz \
+    && rm pig.tar.gz \
+    && ln -s pig* pig \
+    && chown -R hadoop:users /opt/pig
+
 ENV PATH="$PATH:/opt/pig/bin"
 ENV PIG_HOME=/opt/pig
 ENV PIG_CLASSPATH=/opt/hadoop/conf
 
 # install spark
 ARG SPARK_URL=https://dlcdn.apache.org/spark/spark-4.0.1/spark-4.0.1-bin-without-hadoop.tgz
-RUN curl -LSs -o spark.tar.gz $SPARK_URL && tar zxf spark.tar.gz && rm spark.tar.gz && ln -s spark* spark && chown -R hadoop:users /opt/spark
+RUN curl -LSs -o spark.tar.gz $SPARK_URL \
+    && tar zxf spark.tar.gz \
+    && rm spark.tar.gz \
+    && ln -s spark* spark \
+    && chown -R hadoop:users /opt/spark
+    
 ENV PATH="$PATH:/opt/spark/bin"
 ENV SPARK_HOME="/opt/spark"
 RUN echo "export JAVA_HOME=/opt/java/openjdk-${OPENJDK_VERSION}" > spark/conf/spark-env.sh \
@@ -42,7 +52,11 @@ RUN echo "export JAVA_HOME=/opt/java/openjdk-${OPENJDK_VERSION}" > spark/conf/sp
 
 # install jobimtext
 ARG JOBIMTEXT_URL=http://ltdata1.informatik.uni-hamburg.de/jobimtext-resources/jobimtext.p/jobimtext_pipeline_0.1.5beta.tar.gz
-RUN curl -LSs -o jobimtext.tar.gz $JOBIMTEXT_URL && tar zxf jobimtext.tar.gz && rm jobimtext.tar.gz && ln -s jobimtext* jobimtext && chown -R hadoop:users /opt/jobimtext
+RUN curl -LSs -o jobimtext.tar.gz $JOBIMTEXT_URL \
+    && tar zxf jobimtext.tar.gz \
+    && rm jobimtext.tar.gz \
+    && ln -s jobimtext* jobimtext \
+    && chown -h -R hadoop:users /opt/jobimtext
 RUN apt update -q \
     && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
       python2 \
@@ -70,11 +84,32 @@ RUN curl -LSs -o argparse.tar.gz $PYTHON_ARGPARSE_URL \
     && cd .. \
     && rm -rf argparse*
 
-# configure openssh server
+# RUN addgroup appgroup && \
+#     adduser --disabled-password --gecos "" appuser && \
+#     adduser appuser appgroup && \
+#     echo "appuser:Password@123" | chpasswd && \
+#     echo "appuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+#     chown -R appuser:appgroup /app/
+
+# add a new user or user the existing hadoop user?
+# RUN adduser --disabled-password --gecos "" sshuser && \
+#     echo "sshuser:sshuser" | chpasswd && \
+#     echo "sshuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+RUN adduser hadoop hadoop
+
+RUN useradd --uid 1001 sshuser --gid 100 -G 1000 --home /opt/home-sshuser \
+    && mkdir -p /opt/home-sshuser/.ssh \
+    && touch /opt/home-sshuser/.ssh/authorized_keys \
+    && touch /opt/home-sshuser/.ssh/environment \
+    && chown -R hadoop:users /opt/home-sshuser \
+    && echo "sshuser:hadoop" | chpasswd \
+    && chsh -s /bin/bash sshuser \
+    && chsh -s /bin/bash hadoop \
+    && echo "sshuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
 RUN mkdir -p /var/run/sshd \
     && mkdir -p /run/sshd \
-    && echo "hadoop:hadoop" | chpasswd \
-    && chsh -s /bin/bash hadoop \
     && sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config \
     && echo "PermitRootLogin no" >> /etc/ssh/sshd_config \
     && echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config \
@@ -86,14 +121,15 @@ RUN mkdir -p /var/run/sshd \
     && echo "GatewayPorts yes" >> /etc/ssh/sshd_config \
     && echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config \
     && echo "ClientAliveCountMax 3" >> /etc/ssh/sshd_config \
-    && echo "AllowUsers hadoop" >> /etc/ssh/sshd_config \
+    && echo "AllowUsers sshuser" >> /etc/ssh/sshd_config \
     && echo 'ListenAddress 0.0.0.0' >> /etc/ssh/sshd_config \
     && echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config \
-    && echo "ForceCommand cd /opt/jobimtext && exec bash -l" >> /etc/ssh/sshd_config
+    && echo "ForceCommand sudo -i -u hadoop bash -c 'cd -P /opt/jobimtext && bash -l'" >> /etc/ssh/sshd_config
 
 EXPOSE 22
 
 RUN bash -c 'echo "[ -n \"\$BASH_VERSION\" ] && shopt -s globstar" >> /etc/profile'
+RUN echo "PATH=$PATH" >> /etc/profile
 
 COPY --chown=hadoop --chmod=755 scripts /opt/
 RUN ln -s /opt/ssh-server.sh /usr/local/bin/ssh-server
