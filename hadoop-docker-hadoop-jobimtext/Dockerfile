@@ -26,7 +26,7 @@ RUN curl -LSs -o pig.tar.gz $PIG_URL \
     && tar zxf pig.tar.gz \
     && rm pig.tar.gz \
     && ln -s pig* pig \
-    && chown -R hadoop:users /opt/pig
+    && chown -h -R hadoop:users /opt/pig
 
 ENV PATH="$PATH:/opt/pig/bin"
 ENV PIG_HOME=/opt/pig
@@ -38,7 +38,7 @@ RUN curl -LSs -o spark.tar.gz $SPARK_URL \
     && tar zxf spark.tar.gz \
     && rm spark.tar.gz \
     && ln -s spark* spark \
-    && chown -R hadoop:users /opt/spark
+    && chown -h -R hadoop:users /opt/spark
     
 ENV PATH="$PATH:/opt/spark/bin"
 ENV SPARK_HOME="/opt/spark"
@@ -84,18 +84,7 @@ RUN curl -LSs -o argparse.tar.gz $PYTHON_ARGPARSE_URL \
     && cd .. \
     && rm -rf argparse*
 
-# RUN addgroup appgroup && \
-#     adduser --disabled-password --gecos "" appuser && \
-#     adduser appuser appgroup && \
-#     echo "appuser:Password@123" | chpasswd && \
-#     echo "appuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
-#     chown -R appuser:appgroup /app/
-
-# add a new user or user the existing hadoop user?
-# RUN adduser --disabled-password --gecos "" sshuser && \
-#     echo "sshuser:sshuser" | chpasswd && \
-#     echo "sshuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
+# add hadoop user to hadoop group (gid 1000)
 RUN adduser hadoop hadoop
 
 RUN useradd --uid 1001 sshuser --gid 100 -G 1000 --home /opt/home-sshuser \
