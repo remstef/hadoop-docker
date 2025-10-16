@@ -33,31 +33,31 @@ list-targets:
 	@echo "Available targets: (run with make <target-name>)"
 	@make -n -p | grep -E -o '^[a-zA-Z0-9_\-]+:' | sed 's/://' | grep -v Makefile | sort
 
-h2:
+h2-explicit:
 	@$(eval hadoop_version := 2)
-	@$(eval file := compose-h2.yml)
+	@$(eval file := compose-h2-explicit.yml)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 	@echo "NOTE: hadoop v2 is a legacy version."
 
-h3:
+h3-explicit:
 	@$(eval hadoop_version := 3)
-	@$(eval file := compose-h3.yml)
+	@$(eval file := compose-h3-explicit.yml)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
-h3-nodes:
+h3-sharedservices:
 	@$(eval hadoop_version := 3)
-	@$(eval file := compose-h3-nodes.yml)
+	@$(eval file := compose-h3-sharedservices.yml)
 	@$(eval headnode := headnode)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
-h3-swarm:
+h3-explicit-swarm:
 	@$(eval hadoop_version := 3)
-	@$(eval file := compose-h3-swarm.yml)
+	@$(eval file := compose-h3-explicit-swarm.yml)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
-h3-nodes-swarm:
+h3-sharedservices-swarm:
 	@$(eval hadoop_version := 3)
-	@$(eval file := compose-h3-nodes-swarm.yml)
+	@$(eval file := compose-h3-sharedservices-swarm.yml)
 	@$(eval headnode := headnode)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
@@ -130,6 +130,9 @@ compose-attach-all: check-file
 compose-headnodeid: check-file
 	@$(eval export HEADNODE_CONTAINER := $(shell docker compose -f $(file) ps $(headnode) -q))
 	@echo $(headnode) container id: $(HEADNODE_CONTAINER)	
+
+compose-refreshnodes: compose-headnodeid
+	docker exec $(HEADNODE_CONTAINER) hdfs dfsadmin -refreshNodes
 
 run-jbt-test:
 ifndef HEADNODE_CONTAINER
