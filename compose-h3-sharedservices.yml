@@ -30,7 +30,7 @@ services:
       - 8088:8088
       - 2222:22
     env_file:
-      - ./config-h3.env
+      - ./config-h3-sharedservices.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
       SSH_USER_PASSWORD: x
@@ -46,25 +46,7 @@ services:
     networks:
       - hadoopnet
     env_file:
-      - ./config-h3.env
+      - ./config-h3-sharedservices.env
     environment:
       - SLEEP_SECONDS=5
       - WAITFOR=namenode:8020
-
-  # gatewayserver:
-  #   image: linuxserver/openssh-server
-  #   hostname: gatewayserver
-  #   restart: unless-stopped
-  #   ports:
-  #     - 22222:2222
-  #   networks:
-  #     - hadoopnet
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=UTC
-  #     - USER_NAME=hadoop
-  #     - USER_PASSWORD=hadoop
-  #     - PASSWORD_ACCESS=true
-  #   volumes:
-  #     - ./gatewayserver__sshd_config:/etc/ssh/sshd_config:ro

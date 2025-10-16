@@ -35,7 +35,7 @@ services:
   namenode:
     image: remstef/hadoop3-jobimtext
     env_file:
-      - ./config-h3-swarm.env
+      - ./config-h3-explicit.env
     hostname: namenode
     command: [ "hdfs", "namenode" ]
     environment:
@@ -52,7 +52,7 @@ services:
   datanode1: &hadoopref
     image: remstef/hadoop3
     env_file:
-      - ./config-h3-swarm.env
+      - ./config-h3-explicit.env
     hostname: datanode1
     command: [ "hdfs", "datanode" ]
     networks:

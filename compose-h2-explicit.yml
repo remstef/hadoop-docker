@@ -15,7 +15,7 @@ services:
     #   dockerfile: Dockerfile
     command: ["hdfs", "datanode"]
     env_file:
-      - ./config-h2.env
+      - ./config-h2-explicit.env
     networks:
       - hadoopnet
 
@@ -31,7 +31,7 @@ services:
     ports:
       - 50070:50070
     env_file:
-      - ./config-h2.env
+      - ./config-h2-explicit.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
     networks:
@@ -54,9 +54,9 @@ services:
     hostname: historyserver
     command: ["mapred", "historyserver"]
 
-  gatewayserver:
+  sshgateway:
     image: linuxserver/openssh-server
-    hostname: gatewayserver
+    hostname: sshgateway
     restart: unless-stopped
     ports:
       - 22222:2222

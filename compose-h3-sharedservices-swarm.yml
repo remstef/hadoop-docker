@@ -29,7 +29,7 @@ services:
         protocol: tcp
         mode: host
     env_file:
-      - ./config-h3-nodes-swarm.env
+      - ./config-h3-sharedservices-swarm.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
       SSH_USER_PASSWORD: hadoop
@@ -50,7 +50,7 @@ services:
         wait
       "
     env_file:
-      - ./config-h3-nodes-swarm.env
+      - ./config-h3-sharedservices-swarm.env
     environment:
       - SLEEP_SECONDS=5
       - WAITFOR=headnode:8020
