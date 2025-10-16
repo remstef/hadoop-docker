@@ -22,18 +22,21 @@ services:
           - namenode
           - resourcemanager
           - historyserver
+          - sparkmaster
     ports:
-      - 2222:22
+      - target: 22
+        published: 2222
+        protocol: tcp
+        mode: host
     env_file:
       - ./config-h3-nodes-swarm.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
       SSH_USER_PASSWORD: x
-
     deploy:
-      replicas: 1
+      endpoint_mode: dnsrr
+      mode: global
       placement:
-        max_replicas_per_node: 1
         constraints:
           - node.labels.hadooprole == master
 
@@ -57,9 +60,9 @@ services:
           - datanode01
           - nodemanager01
     deploy:
-      replicas: 1
+      endpoint_mode: dnsrr
+      mode: global
       placement:
-        max_replicas_per_node: 1
         constraints:
           - node.labels.hadooprole == worker1
 
@@ -72,6 +75,8 @@ services:
           - datanode02
           - nodemanager02
     deploy:
+      endpoint_mode: dnsrr
+      mode: global
       placement:
         constraints:
           - node.labels.hadooprole == worker2
@@ -85,6 +90,8 @@ services:
           - datanode03
           - nodemanager03
     deploy:
+      endpoint_mode: dnsrr
+      mode: global
       placement:
         constraints:
           - node.labels.hadooprole == worker3

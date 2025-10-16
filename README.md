@@ -26,6 +26,8 @@ make cluster-attach
 Test yarn/hadoop (execute on any node):
 ```
 yarn jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar pi 10 15
+
+yarn jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar wordcount input output
 ```
 
 Test spark (execute on namenode, :q to quit):

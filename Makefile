@@ -245,38 +245,41 @@ stack-status:
 ssh-info:
 	@echo ""
 	@echo "To connect to the ssh gateway server (headnode) type:"
+	@echo "  Replace <host> with 0.0.0.0 or ::, or 12.0.0.1, or ::1, or $${HOSTNAME},"
+	@echo "  or any IP address docker binds ports to on the host system."
 	@echo ""
-	@echo "  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@::"
+	@echo "  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@<host-or-ip>"
 	@echo ""
 	@echo "If you did not supply a public key, enter the password 'hadoop'."
 	@echo ""
 	@echo "If this is a server, run on your client:"
 	@echo ""
-	@echo "  ssh -J $${HOSTNAME} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@::"
+	@echo "  ssh -J $${HOSTNAME} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@<host-or-ip>"
 	@echo ""
 	@echo "  (add more jumphosts if necessary, e.g. -J jumphost1,jumphost2,$${HOSTNAME})"
 	@echo ""
 	@echo "Use -D to open a SOCKS proxy, without opening a shell (-N), and running ssh in the background (-f)."
 	@echo ""
-	@echo "  ssh -D 1080 -N -f -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@::"
+	@echo "  ssh -D 1080 -N -f -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@<host-or-ip>"
 	@echo ""
 	@echo "Enter the SOCKS proxy details (localhost:1080) in your browser (activate \"use proxy DNS\")."
 	@echo "Addresses:"
 	@echo "  http://resourcemanager:8088"
 	@echo "  http://historyserver:19888"
 	@echo "  http://namenode:9870"
+	@echo "  http://sparkmaster:4040"
 	@echo "  http://nodemanager:8042 (nodemanager{1-3} in swarm mode)"
 	@echo "  http://datanode:9864 (datanode{1-3} in swarm mode)"
 	@echo ""
 
 gateway-info: ssh-info
 
-# make ssh-connect ssh_extra_args=-v 
+# make ssh-connect ssh_args=-v 
 ssh-connect:
-	@echo "SSH extra args: $(ssh_extra_args)"
-	ssh $(ssh_extra_args) -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@0.0.0.0
+	@echo "SSH extra args: $(ssh_args)"
+	ssh $(ssh_args) -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@0.0.0.0
 
 ssh-connect-proxy:
-	@echo "SSH extra args: $(ssh_extra_args)"
-	ssh $(ssh_extra_args) -D 1080 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@0.0.0.0
+	@echo "SSH extra args: $(ssh_args)"
+	ssh $(ssh_args) -D 1080 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@0.0.0.0
 
