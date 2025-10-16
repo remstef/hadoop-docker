@@ -5,17 +5,20 @@ networks:
 
 services:
 
-  gatewayserver:
+  sshgateway:
     image: linuxserver/openssh-server
-    hostname: gatewayserver
+    hostname: sshgateway
     restart: unless-stopped
     ports:
-      - 22222:2222
+      - target: 2222
+        published: 2222
+        protocol: tcp
+        mode: host
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=UTC
-      - USER_NAME=hadoop
+      - USER_NAME=sshuser
       - USER_PASSWORD=hadoop
       - PASSWORD_ACCESS=true
     volumes:
@@ -23,9 +26,9 @@ services:
     networks:
       - hadoopnet
     deploy:
-      replicas: 1
+      endpoint_mode: dnsrr
+      mode: global
       placement:
-        max_replicas_per_node: 1
         constraints:
           - node.labels.hadooprole == master
 
@@ -34,15 +37,15 @@ services:
     env_file:
       - ./config-h3-swarm.env
     hostname: namenode
-    command: ["hdfs", "namenode"]
+    command: [ "hdfs", "namenode" ]
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
     networks:
       - hadoopnet
     deploy:
-      replicas: 1
+      endpoint_mode: dnsrr
+      mode: global
       placement:
-        max_replicas_per_node: 1
         constraints:
           - node.labels.hadooprole == master
 
@@ -51,13 +54,13 @@ services:
     env_file:
       - ./config-h3-swarm.env
     hostname: datanode1
-    command: ["hdfs", "datanode"]
+    command: [ "hdfs", "datanode" ]
     networks:
       - hadoopnet
     deploy:
-      replicas: 1
+      endpoint_mode: dnsrr
+      mode: global
       placement:
-        max_replicas_per_node: 1
         constraints:
           - node.labels.hadooprole == worker1
 
@@ -65,6 +68,8 @@ services:
     <<: *hadoopref
     hostname: datanode2
     deploy:
+      endpoint_mode: dnsrr
+      mode: global
       placement:
         constraints:
           - node.labels.hadooprole == worker2
@@ -73,6 +78,8 @@ services:
     <<: *hadoopref
     hostname: datanode3
     deploy:
+      endpoint_mode: dnsrr
+      mode: global
       placement:
         constraints:
           - node.labels.hadooprole == worker3
@@ -80,8 +87,10 @@ services:
   resourcemanager:
     <<: *hadoopref
     hostname: resourcemanager
-    command: ["yarn", "resourcemanager"]
+    command: [ "yarn", "resourcemanager" ]
     deploy:
+      endpoint_mode: dnsrr
+      mode: global
       placement:
         constraints:
           - node.labels.hadooprole == master
@@ -89,8 +98,10 @@ services:
   nodemanager1:
     <<: *hadoopref
     hostname: nodemanager1
-    command: ["yarn", "nodemanager"]
+    command: [ "yarn", "nodemanager" ]
     deploy:
+      endpoint_mode: dnsrr
+      mode: global
       placement:
         constraints:
           - node.labels.hadooprole == worker1
@@ -98,8 +109,10 @@ services:
   nodemanager2:
     <<: *hadoopref
     hostname: nodemanager2
-    command: ["yarn", "nodemanager"]
+    command: [ "yarn", "nodemanager" ]
     deploy:
+      endpoint_mode: dnsrr
+      mode: global
       placement:
         constraints:
           - node.labels.hadooprole == worker2
@@ -107,8 +120,10 @@ services:
   nodemanager3:
     <<: *hadoopref
     hostname: nodemanager3
-    command: ["yarn", "nodemanager"]
+    command: [ "yarn", "nodemanager" ]
     deploy:
+      endpoint_mode: dnsrr
+      mode: global
       placement:
         constraints:
           - node.labels.hadooprole == worker3
@@ -116,8 +131,10 @@ services:
   historyserver:
     <<: *hadoopref
     hostname: historyserver
-    command: ["mapred", "historyserver"]
+    command: [ "mapred", "historyserver" ]
     deploy:
+      endpoint_mode: dnsrr
+      mode: global
       placement:
         constraints:
-          - node.labels.hadooprole == master
+          - node.labels.hadooprole == worker1
