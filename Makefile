@@ -44,9 +44,9 @@ h3-explicit:
 	@$(eval file := compose-h3-explicit.yml)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
-h3-sharedservices:
+h3-shared:
 	@$(eval hadoop_version := 3)
-	@$(eval file := compose-h3-sharedservices.yml)
+	@$(eval file := compose-h3-shared.yml)
 	@$(eval headnode := headnode)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
@@ -55,9 +55,9 @@ h3-explicit-swarm:
 	@$(eval file := compose-h3-explicit-swarm.yml)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
-h3-sharedservices-swarm:
+h3-shared-swarm:
 	@$(eval hadoop_version := 3)
-	@$(eval file := compose-h3-sharedservices-swarm.yml)
+	@$(eval file := compose-h3-shared-swarm.yml)
 	@$(eval headnode := headnode)
 	@echo "Using Hadoop version $(hadoop_version), and compose file $(file)"
 
@@ -77,6 +77,13 @@ endif
 push-hadoop-runner:
 	docker push remstef/hadoop-runner:$(hadoop_version)
 
+buildx-hadoop-runner:
+ifeq ($(hadoop_version),3)
+	docker buildx build -t remstef/hadoop-runner:$(hadoop_version) --build-arg OPENJDK_VERSION=21-jdk --build-arg OPENJDK_VERSION_HADOOP=11-jdk --platform linux/arm64,linux/amd64 ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+else
+	docker buildx build -t remstef/hadoop-runner:$(hadoop_version) --platform linux/arm64,linux/amd64 ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
+endif
+
 buildx-push-hadoop-runner:
 ifeq ($(hadoop_version),3)
 	docker buildx build -t remstef/hadoop-runner:$(hadoop_version) --build-arg OPENJDK_VERSION=21-jdk --build-arg OPENJDK_VERSION_HADOOP=11-jdk --platform linux/arm64,linux/amd64 --push ./hadoop-docker-hadoop-runner-jdk8_jdk17-u2204
@@ -90,6 +97,9 @@ build-hadoop:
 push-hadoop:
 	docker push remstef/hadoop$(hadoop_version)
 
+buildx-hadoop:
+	docker buildx build -t remstef/hadoop$(hadoop_version)  --platform linux/arm64,linux/amd64 ./hadoop-docker-hadoop-$(hadoop_version)
+
 buildx-push-hadoop:
 	docker buildx build -t remstef/hadoop$(hadoop_version)  --platform linux/arm64,linux/amd64 --push ./hadoop-docker-hadoop-$(hadoop_version)
 
@@ -99,10 +109,13 @@ build-hadoop-jobimtext:
 push-hadoop-jobimtext:
 	docker push remstef/hadoop$(hadoop_version)-jobimtext
 
+buildx-hadoop-jobimtext:
+	docker buildx build -t remstef/hadoop$(hadoop_version)-jobimtext --build-arg HADOOP_VERSION=$(hadoop_version) --platform linux/arm64,linux/amd64 ./hadoop-docker-hadoop-jobimtext
+
 buildx-push-hadoop-jobimtext:
 	docker buildx build -t remstef/hadoop$(hadoop_version)-jobimtext --build-arg HADOOP_VERSION=$(hadoop_version) --platform linux/arm64,linux/amd64 --push ./hadoop-docker-hadoop-jobimtext
 
-pull-hadoop:
+pull-images:
 	docker pull remstef/hadoop$(hadoop_version)
 	docker pull remstef/hadoop$(hadoop_version)-jobimtext
 
@@ -149,7 +162,7 @@ ifndef HEADNODE_CONTAINER
 endif
 	docker exec $(HEADNODE_CONTAINER) hdfs dfs -mkdir -p /user/hadoop/mouse \
 	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $(HEADNODE_CONTAINER) hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  ; RUNSCRIPT=$$(docker exec $(HEADNODE_CONTAINER) python2 generateHadoopScript.py -f 1 -w 3 -wf 1 -p 100 -wpfmin 1 -l 20 -af -nb -hl trigram -hm 5 -lines 1000 mouse | tail -n1) \
+	  ; RUNSCRIPT=$$(docker exec $(HEADNODE_CONTAINER) python2 generateHadoopScript.py -f 2 -w 2 -wf 2 -p 100 -wpfmin 2 -l 20 -af -nb -hl trigram -hm 5 -lines 1000 mouse | tail -n1) \
 	  && echo scriptfile: $${RUNSCRIPT} \
 		&& HDFSOUTDIR=$$(docker exec $(HEADNODE_CONTAINER) cat $${RUNSCRIPT} | tail -n 1 | grep -o -E "OUT=[^ ]*" | sed 's/OUT=//') \
 		&& echo hdfs output directory: $${HDFSOUTDIR} \

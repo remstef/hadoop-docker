@@ -2,15 +2,44 @@
 
 This project offers single- or multi node [Apache Hadoop](https://hadoop.apache.org/) cluster docker images and docker compose files with [jobimtext](https://sourceforge.net/projects/jobimtext/), [Apache pig](https://pig.apache.org/) and [Apache Spark](https://spark.apache.org/) enabled.
 
-## Run single node local cluster with compose
+# Quickstart
 
-Start single node cluster (Note: hadoop2 is available as a legacy version; hadoop3 is preffered):
+Run `make` to list all targets.
+
+Makefile targets are designed to run in sequential order. 
+
+This repository offers two configurations:
+* `explicit`: One docker container per hadoop service
+* `shared`: One docker container may run multiple hadoop services
+
+Both configurations can be run with `compose` in a single machine setup, or in a `swarm` as a multi-machine setup.
+
+## Run single- or multi machine cluster with compose (local) or stack (swarm)
+
+Start single machine hadoop cluster (Note: hadoop2 is available as a legacy version; hadoop3 is preferred).
+
+Run make targets in sequential order, define the preferred configuration
 ```
-make compose-h2-up
+make <config> compose-up compose-status
 
-or
+<config> = { h3-explicit, h3-shared }
 
-make compose-h3-up
+e.g.
+
+make h3-shared compose-up compose-status
+```
+
+Start multi machine hadoop cluster (shared is preferred).
+
+Run make targets in sequential order, define the preferred configuration
+```
+make <config> stack-deploy stack-status
+
+<config> = { h3-explicit-swarm, h3-shared-swarm }
+
+e.g.
+
+make h3-shared-swarm stack-deploy stack-status
 ```
 
 Print information to open a socks proxy forward via ssh to access hadoop internal Web UIs:
@@ -18,47 +47,82 @@ Print information to open a socks proxy forward via ssh to access hadoop interna
 make ssh-info
 ```
 
-Attach to containers (requires tmux to be installed):
+Connect to ssh server (gateway or headnode, depending on `<config>`; see respective compose file):
 ```
-make cluster-attach
+make ssh-connect
+
+or 
+
+make ssh-connect-proxy
 ```
 
-Test yarn/hadoop (execute on any node):
+Pass extra ssh arguments, e.g.
+```
+make ssh-connect ssh_args="-J <jumphost(s)>"
+
+or 
+
+make ssh-connect-proxy ssh_args="-J <jumphost(s)>"
+```
+
+Attach to the headnode container:
+```
+make <config> compose-attach-headnode
+
+or 
+
+make <config> swarm-attach-headnode
+```
+
+Attach to all compose containers (requires tmux to be installed):
+```
+make <config> compose-attach-all
+```
+
+Test yarn/hadoop (execute on any node, preferrably the headnode):
 ```
 yarn jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar pi 10 15
 
 yarn jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar wordcount <input> <output> && hdfs dfs -cat <output>/*
 ```
 
-Test spark (execute on namenode, :q to quit):
+Test spark (execute on headnode, :q to quit):
 ```
 spark-shell --master=yarn
 ```
 
-Test pig (execute on namenode, \q to quit):
+Test pig (execute on headnode, \q to quit):
 ```
 pig -
 ```
 
-Test jobimtext (execute on namenode):
+Test jobimtext (execute on headnode):
 ```
 hdfs dfs -mkdir -p /user/hadoop/mouse
 hdfs dfs -put mouse-corpus.txt /user/hadoop/mouse/corpus.txt
-python2 generateHadoopScript.py -hl trigram -nb mouse
-sh mouse_trigram_s0.0_f2_w2_wf2_wpfmax1000_wpfmin2_p1000_sc_log_scored_LMI_simsort_ms_2_l200.sh
+python2 generateHadoopScript.py -f 2 -w 3 -wf 2 -p 100 -wpfmin 2 -l 20 -af -nb -hl trigram -hm 5 -lines 1000 mouse
+sh <generated-scriptfile>
 ```
 
 Alternatively run jobimtext test w/o being attached
 ```
-make compose-h3-runtest
+make <config> compose-runtest
+
+or
+
+make <config> stack-runtest
 ```
 
-Shutdown single-node local cluster
+Shutdown single machine or multi-machine cluster
 ```
-make compose-down
+make <config> compose-down
+
+or
+
+make <config> stack-rm
 ```
 
-## Run multi node cluster with docker swarm
+## Set up docker swarm
 
 Required once (manual process, the following commmand prints the instructions):
 ```
@@ -70,75 +134,70 @@ Check status of swarm nodes
 make swarm-status
 ```
 
-Start multinode cluster on a docker swarm with compose file (here, example with 4 nodes, 1 manager & 3 workers, see `docker-compose-h3-jobimtext-swarm-explicit.yml`; execute on the docker swarm manager; Note run `make pull-hadoop3` before to speed up deployment.)
+Start multinode cluster on a docker swarm with compose file (here, example with 4 nodes, 1 manager & 3 workers, see `compose-h3-explicit-swarm.yml` and `compose-h3-shared-swarm.yml`; execute on the docker swarm manager; Note, to speed up deployment run initially `make pull-images`.)
 ```
-make swarm-stack-deploy
-```
+make <config> stack-deploy
 
-Check the status of the containers in the swarm stack
-```
-make swarm-stack-status
-```
-
-Print information to open a socks proxy forward via ssh to access hadoop internal Web UIs:
-```
-make ssh-info
-```
-
-Run jobimtext test:
-```
-make swarm-stack-runtest
-```
-
-Attach to namenode:
-```
-make swarm-stack-attach-namenode
-```
-
-Get namenode container id:
-```
-make swarm-stack-namenode
-```
-
-Shutdown multinode cluster:
-```
-make swarm-stack-rm
+(cf. above)
 ```
 
 ## Makefile targets
 
 ```
-list-targets
+list-targets (default)
 
-build-hadoop2
-build-hadoop2-jobimtext
-build-hadoop2-runner
-build-hadoop3
-build-hadoop3-jobimtext
-build-hadoop3-runner
+check-file
 
-push-hadoop3
-push-hadoop3-jobimtext
+h2-explicit
+h3-explicit
+h3-explicit-swarm
+h3-shared
+h3-shared-swarm
 
-pull-hadoop3
+pull-images
 
-compose-h2-up
-compose-h2-runtest
-compose-h3-up
-compose-h3-runtest
-compose-attach
+compose-up
+compose-status
+compose-stats
 compose-down
+compose-headnodeid
+compose-attach-headnode
+compose-attach-all
+compose-refreshnodes
+compose-runtest
 
-ssh-info
+ssh-connect
+ssh-connect-proxy
+ssh-info / gateway-info
 
 swarm-init-info
 swarm-status
-swarm-stack-deploy
-swarm-stack-status
-swarm-stack-namenode
-swarm-stack-runtest
-swarm-stack-attach-namenode
-swarm-stack-rm
+
+stack-deploy
+stack-status
+stack-rm
+stack-headnodeid
+stack-attach-headnode
+stack-refreshnodes
+stack-runtest
+
+# for development purposes
+
+buildx-hadoop-runner
+buildx-push-hadoop-runner
+buildx-hadoop
+buildx-push-hadoop
+buildx-hadoop-jobimtext
+buildx-push-hadoop-jobimtext
+
+(deprecated, prefer multi-platform builds with buildx)
+build-hadoop-runner
+build-hadoop
+build-hadoop-jobimtext
+
+push-hadoop-runner
+push-hadoop
+push-hadoop-jobimtext
 ```
 
 ## Notes:
