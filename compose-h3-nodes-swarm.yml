@@ -32,7 +32,7 @@ services:
       - ./config-h3-nodes-swarm.env
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
-      SSH_USER_PASSWORD: x
+      SSH_USER_PASSWORD: hadoop
     deploy:
       endpoint_mode: dnsrr
       mode: global

@@ -250,7 +250,7 @@ ssh-info:
 	@echo ""
 	@echo "  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 hadoop@<host-or-ip>"
 	@echo ""
-	@echo "If you did not supply a public key, enter the password 'hadoop'."
+	@echo "If you did not supply a public key, enter the password defined in the respective compose file (default 'hadoop')."
 	@echo ""
 	@echo "If this is a server, run on your client:"
 	@echo ""
