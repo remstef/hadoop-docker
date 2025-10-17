@@ -162,7 +162,7 @@ ifndef HEADNODE_CONTAINER
 endif
 	docker exec $(HEADNODE_CONTAINER) hdfs dfs -mkdir -p /user/hadoop/mouse \
 	  && cat ./test-resources/mouse-corpus.txt | docker exec -i $(HEADNODE_CONTAINER) hdfs dfs -put - /user/hadoop/mouse/corpus.txt \
-	  ; RUNSCRIPT=$$(docker exec $(HEADNODE_CONTAINER) python2 generateHadoopScript.py -f 2 -w 2 -wf 2 -p 100 -wpfmin 2 -l 20 -af -nb -hl trigram -hm 5 -lines 1000 mouse | tail -n1) \
+	  ; RUNSCRIPT=$$(docker exec $(HEADNODE_CONTAINER) python2 generateHadoopScript.py -f 2 -w 2 -wf 2 -p 100 -wpfmin 2 -l 20 -af -nb -hl $(hl) -hm $(hm) -lines 1000 mouse | tail -n1) \
 	  && echo scriptfile: $${RUNSCRIPT} \
 		&& HDFSOUTDIR=$$(docker exec $(HEADNODE_CONTAINER) cat $${RUNSCRIPT} | tail -n 1 | grep -o -E "OUT=[^ ]*" | sed 's/OUT=//') \
 		&& echo hdfs output directory: $${HDFSOUTDIR} \
@@ -170,6 +170,8 @@ endif
 		; docker exec $(HEADNODE_CONTAINER) hdfs dfs -text "$${HDFSOUTDIR}/*" | grep "^mouse" | head -n 10
 
 compose-runtest: compose-headnodeid
+	@$(eval export hl ?= trigram)
+	@$(eval export hm ?= 5)
 	$(MAKE) run-jbt-test
 
 swarm-init-info:
@@ -241,6 +243,8 @@ stack-attach-headnode: stack-headnodeid
 	docker exec -ti ${HEADNODE_CONTAINER} bash
 
 stack-runtest: stack-headnodeid
+	@$(eval export hl ?= trigram)
+	@$(eval export hm ?= 5)
 	$(MAKE) run-jbt-test
 
 stack-refreshnodes: stack-headnodeid
