@@ -4,7 +4,7 @@ This project offers single- or multi node [Apache Hadoop](https://hadoop.apache.
 
 # Quickstart
 
-Run `make` to list all targets.
+Run `make` to list [all targets](#makefile-targets).
 
 Makefile targets are designed to run in sequential order. 
 
