@@ -29,7 +29,7 @@ e.g.
 make h3-shared compose-up compose-status
 ```
 
-Start multi machine hadoop cluster (requires a docker swarm to be set up, @see swarm setup; `shared` config is preferred).
+Start multi machine hadoop cluster (requires a docker swarm to be set up, @see (#set-up-docker-swarm); `shared` config is preferred).
 
 ```
 make <config> stack-deploy stack-status
