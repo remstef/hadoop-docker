@@ -22,16 +22,15 @@ Run make targets in sequential order, define the preferred configuration
 ```
 make <config> compose-up compose-status
 
-<config> = { h3-explicit, h3-shared }
+<config> = { h2-explicit, h3-explicit, h3-shared }
 
 e.g.
 
 make h3-shared compose-up compose-status
 ```
 
-Start multi machine hadoop cluster (shared is preferred).
+Start multi machine hadoop cluster (requires a docker swarm to be set up, @see swarm setup; `shared` config is preferred).
 
-Run make targets in sequential order, define the preferred configuration
 ```
 make <config> stack-deploy stack-status
 
@@ -42,7 +41,7 @@ e.g.
 make h3-shared-swarm stack-deploy stack-status
 ```
 
-Print information to open a socks proxy forward via ssh to access hadoop internal Web UIs:
+Print information on how to open a socks proxy forward via ssh to access Hadoop's internal Web UIs:
 ```
 make ssh-info
 ```
@@ -104,7 +103,7 @@ python2 generateHadoopScript.py -f 2 -w 3 -wf 2 -p 100 -wpfmin 2 -l 20 -af -nb -
 sh <generated-scriptfile>
 ```
 
-Alternatively run jobimtext test w/o being attached
+Alternatively run automatic jobimtext test w/o being attached
 ```
 make <config> compose-runtest
 
@@ -113,7 +112,7 @@ or
 make <config> stack-runtest
 ```
 
-Shutdown single machine or multi-machine cluster
+Shutdown single- or multi machine cluster
 ```
 make <config> compose-down
 
@@ -124,7 +123,7 @@ make <config> stack-rm
 
 ## Set up docker swarm
 
-Required once (manual process, the following commmand prints the instructions):
+Required once (manual process, the following command prints the instructions):
 ```
 make swarm-init-info
 ```
