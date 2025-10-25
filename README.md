@@ -204,13 +204,13 @@ push-hadoop-jobimtext
 * ATTENTION: Data is not persisted, once the cluster's containers are shutdown, the data within the hdfs is lost!
 
 ## Docker images
-* https://hub.docker.com/repository/docker/remstef/hadoop3-jobimtext
-* https://hub.docker.com/repository/docker/remstef/hadoop3
-* https://hub.docker.com/repository/docker/remstef/hadoop-runner
+* https://hub.docker.com/r/remstef/hadoop3-jobimtext
+* https://hub.docker.com/r/remstef/hadoop3
+* https://hub.docker.com/r/remstef/hadoop-runner
 
 (Legacy Hadoop Version 2)
-* https://hub.docker.com/repository/docker/remstef/hadoop2
-* https://hub.docker.com/repository/docker/remstef/hadoop2-jobimtext
+* https://hub.docker.com/r/remstef/hadoop2
+* https://hub.docker.com/r/remstef/hadoop2-jobimtext
 
 ## Attribution
 Dockerfiles taken from the Apache Hadoop project:
